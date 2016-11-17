@@ -99,7 +99,7 @@
 
 ---
 ## 性能优化
-### 内存泄漏
+### [内存泄漏](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F.md)
 ###
 
 ---
