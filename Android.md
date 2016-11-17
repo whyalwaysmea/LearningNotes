@@ -1,4 +1,4 @@
-## [基础知识](https://github.com/whyalwaysmea/awesome_android/tree/master/tips/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86)
+## [基础知识](https://github.com/whyalwaysmea/LearningNotes/tree/master/Android)
 
 ### Context
 [Context完全解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Context.md)
