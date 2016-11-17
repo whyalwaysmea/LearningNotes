@@ -1,0 +1,3 @@
+# Activity的工作过程
+
+我们从Activity的startActivity方法开始分析，startActivity方法有好几种重载方式，但它们最终都会调用startActivityForResult方法。
