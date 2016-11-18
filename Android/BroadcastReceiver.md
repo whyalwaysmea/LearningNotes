@@ -36,3 +36,21 @@ registerReceiver(networkChangeReceiver, intentFilter);
 ```
 我们创建了一个IntentFilter的实例，并给它添加了一个值为android.net.conn.CONNECTIVITY_CHANGE的action。因为当网络状态发生变化的时候，系统发出一条值为android.net.conn.CONNECTIVITY_CHANGE的广播，也就是说我们的广播接收器想要监听什么广播，就在这里添加相应的action就行了。
 最后要记得，动态注册的广播接收器一定都要调用`unregisterReceiver()`取消注册才行。
+
+## 静态注册
+1.创建一个类，继承BroadcastReceiver
+
+2.在AndroidManifest.xml文件中进行相应设置
+```xml
+<receiver android:name=".NetworkChangeReceiver">
+	<intent-filter>
+		<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+	</intent-filter>
+</receiver>
+```
+首先通过android:name来指定具体注册哪一个广播接收器，然后在<intent-filter>标签中加入想要接收的广播就可以了
+
+## 区别
+动态注册的广播接收器可以自由地控制注册与注销，在灵活性方面有很大的优势，但是它也存在着一个缺点，即必须要在程序启动之后执行相应注册后才能接收到广播。静态注册的方式可以让程序在未启动的情况下就能接收到广播。
+
+注意：不要在`onReceive()`方法中添加过多的逻辑或者进行任何的耗时操作，因为在广播接收器中是不允许开启线程的，当onReceive()方法运行了较长时间而没有结束时，程序就会报错。
