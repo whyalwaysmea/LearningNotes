@@ -13,8 +13,8 @@
 * [IntentService](http://blog.csdn.net/lmj623565791/article/details/47143563)
 
 ### BroadcastReceiver
-* 注册方式
-* LocalBroadcast
+* [注册方式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/BroadcastReceiver.md)
+* [发送自定义广播和LocalBroadcast]()
 
 
 ### ContentProvider
