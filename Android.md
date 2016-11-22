@@ -14,7 +14,7 @@
 
 ### BroadcastReceiver
 * [注册方式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/BroadcastReceiver.md)
-* [发送自定义广播和LocalBroadcast]()
+* [发送自定义广播和LocalBroadcast](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/SendBroadcast%20.md)
 
 
 ### ContentProvider
