@@ -1,4 +1,4 @@
-## [基础知识](https://github.com/whyalwaysmea/LearningNotes/tree/master/Android)
+﻿## [基础知识](https://github.com/whyalwaysmea/LearningNotes/tree/master/Android)
 
 ### Context
 [Context完全解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Context.md)
@@ -116,6 +116,8 @@
 ### Gradle
 ### JCenter
 ### 编译，混淆，签名，打包，多渠道打包
+[Android打包提速实践](http://www.jianshu.com/p/e456a5ac8613)
+[该作者的更多实践](https://github.com/tianzhijiexian/Android-Best-Practices)
 ### AndroidManifest
 ### 权限管理
 ### adb
