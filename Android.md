@@ -96,7 +96,8 @@
 
 ---
 ## 测试
-
+### [什么是单元测试](http://www.jianshu.com/p/78a67817ee5a)
+### [初入Android单元测试 - JUnit](http://www.jianshu.com/p/bd7124b6ff4c)
 ---
 ## 性能优化
 ### [内存泄漏](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F.md)
