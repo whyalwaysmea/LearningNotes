@@ -96,8 +96,10 @@
 
 ---
 ## 测试
-### [什么是单元测试](http://www.jianshu.com/p/78a67817ee5a)
-### [初入Android单元测试 - JUnit](http://www.jianshu.com/p/bd7124b6ff4c)
+### [Android单元测试: 首先，从是什么开始](http://chriszou.com/2016/04/13/android-unit-testing-start-from-what.html)
+### [在 MVP 中进行单元测试](http://www.jianshu.com/p/7fe8593fb12e)
+### [解读Android官方MVP项目单元测试](http://www.jianshu.com/p/cf446be43ae8)
+
 ---
 ## 性能优化
 ### [内存泄漏](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F.md)
