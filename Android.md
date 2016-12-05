@@ -65,7 +65,7 @@
 ### sqlite
 ### 序列化
 ### Android文件系统
-
+### [Android存储挖坑记](http://blog.desmondyao.com/android-storage/)
 ---
 ## 多媒体
 ### 视频
