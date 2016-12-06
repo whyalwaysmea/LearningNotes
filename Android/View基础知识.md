@@ -56,5 +56,3 @@ mGestureDetector.setIsLongPressEnabled(false);
 boolean consume = mGestureDetector.onTouchEvent(event);
 return consume;
 ```
-
-# Scroller

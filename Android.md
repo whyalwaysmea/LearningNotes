@@ -33,6 +33,7 @@
 
 -----
 ## View相关
+### [View基础知识](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
 ### 基础布局
 ### 常用控件
 ### 事件传递机制
