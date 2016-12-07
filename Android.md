@@ -35,7 +35,7 @@
 ## View相关
 ### [View基础知识](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
 ### [View的滑动](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E7%9A%84%E6%BB%91%E5%8A%A8.md)
-### [View的测量--onMeasure](http://blog.csdn.net/lfdfhl/article/details/51347818)
+### [View的测量--onMeasure](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E7%9A%84%E6%B5%8B%E9%87%8F.md)
 ### 事件传递机制
 ### 自定义View
 ### 动画
