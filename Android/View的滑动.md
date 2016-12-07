@@ -1,8 +1,12 @@
 # 简介
-View的滑动有三种实现方式：
+View的滑动有常见的实现方式：
 1. 通过View本身提供的scrollTo/scrollBy方法;
 2. 通过动画给View施加平移效果来实现滑动;
 3. 通过改变View的LayoutParams使得View重新布局从而实现滑动。
+4. offsetLeftAndRight()与offsetTopAndBottom();
+5. Scroller;
+6. layout方法;
+7. ViewDragHelper;
 
 
 # 使用scrollTo/scrollBy
