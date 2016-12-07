@@ -134,6 +134,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 }
 ```
 onMeasure( )源码流程如下:
+
 1. 在onMeasure调用setMeasuredDimension( )设置View的宽和高.
 2. 在setMeasuredDimension()中调用getDefaultSize()获取View的宽和高.
 3. 在getDefaultSize()方法中又会调用到getSuggestedMinimumWidth()或者getSuggestedMinimumHeight()获取到View宽和高的最小值.
