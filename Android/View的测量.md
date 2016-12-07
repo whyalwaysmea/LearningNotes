@@ -119,6 +119,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 除此以外还有一种常见的操作：
 measureChild( )调用getChildMeasureSpec( )
 那么，measureChildWithMargins( )和measureChild( )有什么相同点和区别呢？
+
 1. measureChildWithMargins( )和measureChild( )均用来测量子View的大小
 2. 两者在调用getChildMeasureSpec( )均要计算父View已占空间
 3. 在measureChild( )计算父View所占空间为mPaddingLeft + mPaddingRight，即父容器左右两侧的padding值之和
