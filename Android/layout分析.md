@@ -180,9 +180,12 @@ void layoutVertical(int left, int top, int right, int bottom) {
 }
 ```
 通过分析源码到这我们就可以理清楚思路了：
+
 ViewGroup首先调用了layout()确定了自己本身在其父View中的位置，然后调用onLayout()确定每个子View的位置，每个子View又会调用View的layout()方法来确定自己在ViewGroup的位置。
+
 **小结一下：**
-View的layout()方法用于View确定自己本身在其父View的位置
+
+>View的layout()方法用于View确定自己本身在其父View的位置
 ViewGroup的onLayout()方法用于确定子View的位置
 
 # 总结
