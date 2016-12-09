@@ -61,8 +61,8 @@ protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, i
 ```java
 public static int getChildMeasureSpec(int spec, int padding, int childDimension) {
     //获取父容器的specMode,specSize
-   int specMode = View.MeasureSpec.getMode(spec);
-   int specSize = View.MeasureSpec.getSize(spec);
+   int specMode = MeasureSpec.getMode(spec);
+   int specSize = MeasureSpec.getSize(spec);
    // 得到父容器在水平方向或垂直方向可用的最大空间值
    int size = Math.max(0, specSize - padding);
 
@@ -74,47 +74,54 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
             // 当子View的宽或高为一个具体值，比如：100dp
            if (childDimension >= 0) {
                resultSize = childDimension;
-               resultMode = View.MeasureSpec.EXACTLY;
+               resultMode = MeasureSpec.EXACTLY;
            } else if (childDimension == LayoutParams.MATCH_PARENT) {
                // 当子View的宽或高为MATCH_PARENT
                resultSize = size;
-               resultMode = View.MeasureSpec.EXACTLY;
+               resultMode = MeasureSpec.EXACTLY;
            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
                // 当子View的宽或高为WRAP_CONTENT
                resultSize = size;
-               resultMode = View.MeasureSpec.AT_MOST;
+               resultMode = MeasureSpec.AT_MOST;
            }
            break;
 
        case View.MeasureSpec.AT_MOST:
            if (childDimension >= 0) {
                resultSize = childDimension;
-               resultMode = View.MeasureSpec.EXACTLY;
+               resultMode = MeasureSpec.EXACTLY;
            } else if (childDimension == LayoutParams.MATCH_PARENT) {
                resultSize = size;
-               resultMode = View.MeasureSpec.AT_MOST;
+               resultMode = MeasureSpec.AT_MOST;
            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
                resultSize = size;
-               resultMode = View.MeasureSpec.AT_MOST;
+               resultMode = MeasureSpec.AT_MOST;
            }
            break;
 
-       case View.MeasureSpec.UNSPECIFIED:
-           if (childDimension >= 0) {
-               resultSize = childDimension;
-               resultMode = View.MeasureSpec.EXACTLY;
-           } else if (childDimension == LayoutParams.MATCH_PARENT) {
-               resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
-               resultMode = View.MeasureSpec.UNSPECIFIED;
-           } else if (childDimension == LayoutParams.WRAP_CONTENT) {
-               resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
-               resultMode = View.MeasureSpec.UNSPECIFIED;
-           }
-           break;
+       case MeasureSpec.UNSPECIFIED:
+            if (childDimension >= 0) {
+                // Child wants a specific size... let him have it
+                resultSize = childDimension;
+                resultMode = MeasureSpec.EXACTLY;
+            } else if (childDimension == LayoutParams.MATCH_PARENT) {
+                // Child wants to be our size... find out how big it should
+                // be
+                resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
+                resultMode = MeasureSpec.UNSPECIFIED;
+            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+                // Child wants to determine its own size.... find out how
+                // big it should be
+                resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
+                resultMode = MeasureSpec.UNSPECIFIED;
+            }
+            break;
+        }
    }
    return View.MeasureSpec.makeMeasureSpec(resultSize, resultMode);
 }
 ```
+上述方法不难理解，它的主要作用是根据父容器的MeasureSpec同时结合View本身的LayoutParams来确定子元素的MeasureSpec. 
 该方法就是确定子View的MeasureSpec的具体实现。
 ![](http://img.blog.csdn.net/20160510112048981)
 
