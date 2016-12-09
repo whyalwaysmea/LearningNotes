@@ -115,6 +115,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
    return View.MeasureSpec.makeMeasureSpec(resultSize, resultMode);
 }
 ```
+上述方法不难理解，它的主要作用是根据父容器的MeasureSpec同时结合View本身的LayoutParams来确定子元素的MeasureSpec. 
 该方法就是确定子View的MeasureSpec的具体实现。
 ![](http://img.blog.csdn.net/20160510112048981)
 
