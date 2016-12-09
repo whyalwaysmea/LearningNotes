@@ -21,6 +21,9 @@ int measureSpec=MeasureSpec.makeMeasureSpec(size, mode);
 * UNSPECIFIED
 它不指定其大小测量模式，View想多大就多大，通常情况下在绘制自定义View的时候才会使用。这种情况一般用于系统内部，在此就不做过多讲解。
 
+# Measure过程
+Measure的过程要分情况来看，如果只是一个原始的View，那么通过measure方法就完成了其测量过程，如果是一个ViewGroup，除了完成自己的测量过程外，还会遍历去调用所有子元素的measure方法，各个子元素再递归去执行这个流程。
+
 
 # MeasureSpec的形成
 在ViewGroup中测量子View时会调用到measureChildWithMargins()方法，或者与之类似的方法。源码如下：
@@ -197,6 +200,51 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     }  
  }
 ```
+
+# 获取View的宽/高
+当我们想在Activity已启动的时候做一件任务，但是这一件任务需要获取某个View的宽/高。但是因为View的measure过程和Activity生命周期方法不是同步执行的，所以无法保证Activity执行了onCreate(),onStart(),onResume()时某个View已经测量完毕了，如果View还没有测量完毕，那么获取到的宽/高就是0.
+那么我们来看看到底有哪些方法来在Activity中获取宽/高
+
+1. Activity/View#onWindowFocusChanged
+这个方法的含义是：View已经初始化完毕了，宽/高已经准备好了，这个时候去获取宽/高是没有问题的。需要注意的是，onWindowFocusChanged会被调用多次，当Activity的窗口得到焦点和失去焦点的时候均会被调用一次。
+```java
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if(hasFocus) {
+        int width = view.getMeasuredWidth();
+        int height = view.getMeasuredHeight();
+    }
+}
+```
+
+2. view.post(runnable)
+通过post可以将一个runnable投递到消息队列的尾部，然后等待Looper调用此runnable的时候，View已经初始化好了
+```java
+view.post(new Runnable() {
+    @Override
+    public void run() {
+        int measuredWidth = view.getMeasuredWidth();
+        int measuredHeight = view.getMeasuredHeight();
+    }
+});
+```
+
+3. ViewTreeObserver
+```java
+final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+    @Override
+    public void onGlobalLayout() {
+        viewTreeObserver.removeGlobalOnLayoutListener(this);
+        int measuredWidth = view.getMeasuredWidth();
+        int measuredHeight = view.getMeasuredHeight();
+    }
+});
+```
+
+4. view.measure(int widthMeasureSpec, int heightMeasureSpec);
+通过手动对View进行measure来得到View的宽/高。
 
 # 相关链接
 [自定义View系列教程02--onMeasure源码详尽分析](http://blog.csdn.net/lfdfhl/article/details/51347818)
