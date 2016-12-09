@@ -205,7 +205,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 当我们想在Activity已启动的时候做一件任务，但是这一件任务需要获取某个View的宽/高。但是因为View的measure过程和Activity生命周期方法不是同步执行的，所以无法保证Activity执行了onCreate(),onStart(),onResume()时某个View已经测量完毕了，如果View还没有测量完毕，那么获取到的宽/高就是0.
 那么我们来看看到底有哪些方法来在Activity中获取宽/高
 
-1. Activity/View#onWindowFocusChanged
+1.Activity/View#onWindowFocusChanged
 这个方法的含义是：View已经初始化完毕了，宽/高已经准备好了，这个时候去获取宽/高是没有问题的。需要注意的是，onWindowFocusChanged会被调用多次，当Activity的窗口得到焦点和失去焦点的时候均会被调用一次。
 ```java
 @Override
@@ -218,7 +218,7 @@ public void onWindowFocusChanged(boolean hasFocus) {
 }
 ```
 
-2. view.post(runnable)
+2.view.post(runnable)
 通过post可以将一个runnable投递到消息队列的尾部，然后等待Looper调用此runnable的时候，View已经初始化好了
 ```java
 view.post(new Runnable() {
@@ -230,7 +230,7 @@ view.post(new Runnable() {
 });
 ```
 
-3. ViewTreeObserver
+3.ViewTreeObserver
 ```java
 final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
 viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -243,7 +243,7 @@ viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutLi
 });
 ```
 
-4. view.measure(int widthMeasureSpec, int heightMeasureSpec);
+4.view.measure(int widthMeasureSpec, int heightMeasureSpec);
 通过手动对View进行measure来得到View的宽/高。
 
 # 相关链接
