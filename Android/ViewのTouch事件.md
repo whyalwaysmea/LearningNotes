@@ -39,10 +39,12 @@ DecorView继承自FrameLayout它是整个界面的最外层的ViewGroup。
 
 Touch事件的传递顺序为
 Activity–>外层ViewGroup–>内层ViewGroup–>View
+
 Touch事件的消费顺序为
 View–>内层ViewGroup–>外层ViewGroup–>Activity
 
 在Touch事件的传递过程中，如果上一级拦截了Touch那么其下一级就无法在收到Touch事件。
+
 在Touch事件的消费过程中，如果下一级消费Touch事件那么其上一级就无法处理Touch事件。
 
 
