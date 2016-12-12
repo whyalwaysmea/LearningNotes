@@ -1,5 +1,5 @@
 # View对Touch事件的处理
-![](http://img.blog.csdn.net/20160601225357520)
+![View的Touch事件](http://img.blog.csdn.net/20160601225357520)
 
 1. View处理Touch事件的总体流程
 dispatchTouchEvent()—>onTouch()—>onTouchEvent()—>onClick()
@@ -55,6 +55,7 @@ View–>内层ViewGroup–>外层ViewGroup–>Activity
 * requestDisallowInterceptTouchEvent(true)，这个方法能够影响父View是否拦截事件，true表示 不拦截事件，false表示拦截事件
 
 这些滑动冲突的产生，一般而言都具有以下特点：
+
 1. 子View和父View都有滑动的需求
 2. 滑动事件不能准确地传递给合适的View
 那么，有哪些方法可以解决滑动冲突呢？
