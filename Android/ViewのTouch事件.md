@@ -37,15 +37,15 @@ DecorView继承自FrameLayout它是整个界面的最外层的ViewGroup。
 如果ViewGroup拦截了Touch事件或者子View不能消耗掉Touch事件，那么ViewGroup会在其自身的onTouch()，onTouchEvent()中处理Touch
 如果子View消耗了Touch事件父View就不能再处理Touch.
 
-Touch事件的传递顺序为
+Touch事件的传递顺序为  
 Activity–>外层ViewGroup–>内层ViewGroup–>View
 
-Touch事件的消费顺序为
+Touch事件的消费顺序为  
 View–>内层ViewGroup–>外层ViewGroup–>Activity
 
-在Touch事件的传递过程中，如果上一级拦截了Touch那么其下一级就无法在收到Touch事件。
-
+在Touch事件的传递过程中，如果上一级拦截了Touch那么其下一级就无法在收到Touch事件。  
 在Touch事件的消费过程中，如果下一级消费Touch事件那么其上一级就无法处理Touch事件。
+
 
 
 # 滑动冲突
