@@ -66,6 +66,82 @@ View–>内层ViewGroup–>外层ViewGroup–>Activity
 2. 在父View中准确地进行事件分发和拦截
 我们可以重写父View中与Touch事件分发相关的方法，比如onInterceptTouchEvent( )。这些方法中摒弃系统默认的流程，结合自身的业务逻辑重写该部分代码，从而使父View放行子View需要的Touch。
 
+解决滑动冲突的两种常见套路：外部拦截和内部拦截；
+既然是套路，那么就是有固定的招数的：
+*外部拦截*: 所谓的外部拦截法是指点击事件都先经过父容器的拦截处理，如果父容器需要此事件就拦截，如果不需要此事件就不拦截，这种处理方式也是符合事件分发机制的流程的。外部拦截法需要重写父View的onInterceptTouchEvent（）方法在内部做相应的处理即可：
+```java
+@Override
+public boolean onInterceptTouchEvent(MotionEvent ev) {
+   boolean isIntercepted = false;
+   int x = (int) ev.getX();
+   int y = (int) ev.getY();
+   switch (ev.getAction()) {
+   case MotionEvent.ACTION_DOWN:
+       isIntercepted = false;
+       break;
+   case MotionEvent.ACTION_MOVE:
+       if(父容器需要当前点击事件){
+           isIntercepted = true;
+       }else{
+           isIntercepted = false;
+       }
+       break;
+   case MotionEvent.ACTION_UP:
+       isIntercepted = false;
+       break;
+
+   default:
+       break;
+   }
+   mLastX = x;
+   mLastY = y;
+   return isIntercepted;
+}
+```
+*内部拦截：* 内部拦截法是指父容器不拦截任何事件，所有的事件都传递给子元素，如果子元素需要就直接消费掉，否则交给父容器进行处理。这种方式和事件分发流程不太一致，需要父容器的onInterceptTouchEvent方法做相应处理，才能完成！使用起来比外部拦截法稍显复杂，我们需要重写子元素的dispatchTouchEvent方法：
+```java
+// 内部view拦截
+@Override
+public boolean dispatchTouchEvent(MotionEvent ev) {
+    int x = (int) ev.getX();
+    int y = (int) ev.getY();
+
+    switch (ev.getAction()) {
+    case MotionEvent.ACTION_DOWN:
+        getParent().requestDisallowInterceptTouchEvent(true);
+        break;
+    case MotionEvent.ACTION_MOVE:
+        int dx = x - mLastX;
+        int dy = y - mLastY;
+        if(父View需要当前点击事件){
+            getParent().requestDisallowInterceptTouchEvent(false);
+        }
+        break;
+    case MotionEvent.ACTION_UP:
+
+        break;
+    default:
+        break;
+    }
+
+    mLastX = x;
+    mLastY = y;
+
+    return super.dispatchTouchEvent(ev);
+}
+
+// 外部view继续拦截
+@Override
+public boolean onInterceptTouchEvent(MotionEvent ev) {
+    int action = ev.getAction();
+    if (action == MotionEvent.ACTION_DOWN) {
+        return false;
+    }else{
+        return true;
+    }
+}
+```
+
 # 相关链接
 [图解 Android 事件分发机制](http://www.jianshu.com/p/e99b5e8bd67b#)
 [详解Touch事件](http://blog.csdn.net/lfdfhl/article/details/51603088)
