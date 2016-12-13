@@ -9,7 +9,7 @@ onTouch()与onTouchEvent()都是处理触摸事件的API
 onTouch()属于TouchListener接口中的方法，是View暴露给用户的接口便于处理触摸事件，而onTouchEvent()是Android系统自身对于Touch处理的实现
 先调用onTouch()后调用onTouchEvent()。而且只有当onTouch()未消费Touch事件才有可能调用到onTouchEvent()。即onTouch()的优先级比onTouchEvent()的优先级更高。
 在onTouchEvent()中处理ACTION_UP时会利用ClickListener执行Click事件。所以Touch的处理是优先于Click的
-简单地说三者执行顺序为：onTouch()–>onTouchEvent()–>onClick()
+简单地说三者执行顺序为：onTouch()/setOnTouchListener()–>onTouchEvent()–>onClick()
 3. View没有事件的拦截(onInterceptTouchEvent( ))，ViewGroup才有，请勿混淆
 
 
@@ -51,10 +51,10 @@ View–>内层ViewGroup–>外层ViewGroup–>Activity
 # 滑动冲突
 在开发中时常遇到一个棘手的问题：Touch事件的滑动冲突。比如ListView嵌套ScrollView，ViewPager嵌套ScrollView，ListView嵌套ScrollView时常常发生。
 先啰嗦一下，View 的事件分发机制主要涉及到一下几个方法:
-* dispatchTouchEvent ，这个方法主要是用来分发事件的
+* dispatchTouchEvent ，这个方法主要是用来分发事件的。返回true，表示被自己消费了；返回false，则表示不分发，还给上一级了自己也不处理；返回super才是继续往下走。
 * onInterceptTouchEvent，这个方法主要是用来拦截事件的（需要注意的是ViewGroup才有这个方法，View没有onInterceptTouchEvent这个方法)。如果返回true,则表示拦截掉了。返回false，则表示传递给子View
-* onTouchEvent这个方法主要是用来处理事件的。返回true，表示处理了。false，表示没有处理，交给上级处理。
-* requestDisallowInterceptTouchEvent(true)，这个方法能够影响父View是否拦截事件，true表示 不拦截事件，false表示拦截事件
+* onTouchEvent这个方法主要是用来处理事件的。返回true，表示处理了。false，表示没有处理，交给上级处理。如果DOWN事件，就返回false，那么就接收不到MOVE,UP事件了。
+* requestDisallowInterceptTouchEvent(true)，这个方法能够影响父View是否拦截事件，true表示不拦截事件，false表示拦截事件
 
 这些滑动冲突的产生，一般而言都具有以下特点：
 
