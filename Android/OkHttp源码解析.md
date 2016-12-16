@@ -339,3 +339,5 @@ protected Interceptor getTokenInterceptor() {
 [拆轮子系列：拆 OkHttp](http://blog.piasy.com/2016/07/11/Understand-OkHttp/)
 
 [从OKHttp框架看代码设计](https://gold.xitu.io/post/581311cabf22ec0068826aff)
+
+[重识OkHttp——探究源码设计](http://www.jianshu.com/p/c58fd0a78791#)
