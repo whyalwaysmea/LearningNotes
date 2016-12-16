@@ -182,3 +182,8 @@ Request request = new Request.Builder()
         .cacheControl(cacheControl)
         .build();
 ```
+
+
+## 相关链接
+[OKHTTP之缓存配置详解](http://www.jianshu.com/p/9b2366f5e97a#)  
+[浅谈Web缓存](http://mp.weixin.qq.com/s?__biz=MzAwNDcyNjI3OA==&mid=2650839643&idx=1&sn=f52455b2fccab886eba89285c0a9c4b8&chksm=80d3b132b7a4382477b28f9eec47cd1a1265f5efe6f8d48ec2d8d38e58fc19150178031d0a47&mpshare=1&scene=23&srcid=1216pZqHcPfWV02770dhK5f5#rd)
