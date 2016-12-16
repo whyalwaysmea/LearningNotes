@@ -40,6 +40,7 @@
 ### [ViewのTouch事件](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E3%81%AETouch%E4%BA%8B%E4%BB%B6.md)
 ### 自定义View
 ### 动画
+### [Android ListView与RecyclerView对比浅析--缓存机制](http://dev.qq.com/topic/5811d3e3ab10c62013697408)
 
 ----
 ## 资源相关
@@ -79,6 +80,7 @@
 ### 基础的Http，Https，Socket
 ### tcp/udp
 ### Retrofit， OkHttp， Volley
+* Okhttpの缓存配置
 
 -----
 ## 图片
