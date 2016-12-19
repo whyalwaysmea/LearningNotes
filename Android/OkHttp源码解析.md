@@ -34,10 +34,10 @@ OkHttpClient和Request其实比较简单，常见的Build模式，配置相关�
 * Prepares the {@code request} to be executed at some point in the future.
 */
 @Override public Call newCall(Request request) {
-    return new RealCall(this, request);
+    return new RealCall(this, request, fasle /*for web socket*/);
 }
 ```
-毫无疑问，我们所调用的`client.newCall(request)`实际就是上面那个方法，可以看到，它其实是调用的`new RealCall(this, request);`
+毫无疑问，我们所调用的`client.newCall(request)`实际就是上面那个方法，可以看到，它其实是调用的`new RealCall(this, request, false);`
 
 那么自然我们就应该去看看RealCall这是个什么东西了，不过，我们可以先来看看Call是什么吧。因为RealCall肯定跟Call是有某种关系的
 ```java
@@ -70,9 +70,12 @@ Call是一个接口，基本上我们会用到的大部分操作都定义在这�
 ```java
 final class RealCall implements Call {
     // 可见，call是持有OKHttpClient和Request的
-    protected RealCall(OkHttpClient client, Request originalRequest) {
+    RealCall(OkHttpClient client, Request originalRequest, boolean forWebSocket) {
         this.client = client;
         this.originalRequest = originalRequest;
+        // 下面这两句是3.4之后才加入的
+        this.forWebSocket = forWebSocket;
+        this.retryAndFollowUpInterceptor = new RetryAndFollowUpInterceptor(client, forWebSocket);
     }
     @Override
     public Response execute() throws IOException {
@@ -81,6 +84,7 @@ final class RealCall implements Call {
             if (executed) throw new IllegalStateException("Already Executed");
             executed = true;
         }
+        captureCallStackTrace();
         try {
             // 利用 client.dispatcher().executed(this) 来进行实际执行，dispatcher 是刚才看到的 OkHttpClient.Builder 的成员之一
             client.dispatcher().executed(this);
@@ -96,16 +100,12 @@ final class RealCall implements Call {
 
     @Override
     public void enqueue(Callback responseCallback) {
-        enqueue(responseCallback, false);
-    }
-
-    void enqueue(Callback responseCallback, boolean forWebSocket) {
         synchronized (this) {
-            if (executed) throw new IllegalStateException("Already Executed");
-            executed = true;
+          if (executed) throw new IllegalStateException("Already Executed");
+          executed = true;
         }
-        // 这里我们需要了解Dispatcher和AsyncCall
-        client.dispatcher().enqueue(new AsyncCall(responseCallback, forWebSocket));
+        captureCallStackTrace();
+        client.dispatcher().enqueue(new AsyncCall(responseCallback));
     }
 }
 ```
@@ -171,12 +171,10 @@ public final class Dispatcher {
 //NamedRunnable实现了Runnable接口，把run()方法封装成了execute()
 final class AsyncCall extends NamedRunnable {
     private final Callback responseCallback;
-    private final boolean forWebSocket;
 
-    private AsyncCall(Callback responseCallback, boolean forWebSocket) {
+    private AsyncCall(Callback responseCallback) {
       super("OkHttp %s", redactedUrl().toString());
-      this.responseCallback = responseCallback;
-      this.forWebSocket = forWebSocket;
+      this.responseCallback = responseCallback;      
     }
     ...
 
@@ -186,12 +184,12 @@ final class AsyncCall extends NamedRunnable {
         try {
           // 返回response
           Response response = getResponseWithInterceptorChain(forWebSocket);
-          if (canceled) {
-            signalledCallback = true;
-             responseCallback.onFailure(RealCall.this, new IOException("Canceled"));
+          if (retryAndFollowUpInterceptor.isCanceled()) {
+              signalledCallback = true;
+              responseCallback.onFailure(RealCall.this, new IOException("Canceled"));
           } else {
-            signalledCallback = true;
-            responseCallback.onResponse(RealCall.this, response);
+              signalledCallback = true;
+              responseCallback.onResponse(RealCall.this, response);
           }
         } catch (IOException e) {
           if (signalledCallback) {
@@ -207,7 +205,8 @@ final class AsyncCall extends NamedRunnable {
 }
 ```
 ## getResponseWithInterceptorChain / Interceptor
-```java
+### 3.3版本如下
+```java  
 private Response getResponseWithInterceptorChain(boolean forWebSocket) throws IOException {
     Interceptor.Chain chain = new ApplicationInterceptorChain(0, originalRequest, forWebSocket);
     return chain.proceed(originalRequest);
@@ -256,13 +255,15 @@ class ApplicationInterceptorChain implements Interceptor.Chain {
 ApplicationInterceptorChain实现了Interceptor.Chain接口，持有Request的引用。
 ```java
 public interface Interceptor {
+  //只有一个接口方法
   Response intercept(Chain chain) throws IOException;
 
   interface Chain {
+    //  Chain其实包装了一个Request请求
     Request request();
-
+    // 获取Response
     Response proceed(Request request) throws IOException;
-
+    // 获得当前网络连接
     Connection connection();
   }
 }
@@ -332,6 +333,98 @@ protected Interceptor getTokenInterceptor() {
 
 在Android系统中最典型的责任链模式就是View的Touch传递机制，一层一层传递直到被消费。
 
+### 3.4版本如下
+```java
+Response getResponseWithInterceptorChain() throws IOException {
+    // Build a full stack of interceptors.
+    List<Interceptor> interceptors = new ArrayList<>();
+    // 添加开发者应用者自定义的Interceptor
+    interceptors.addAll(client.interceptors());
+    // 处理请求失败的重试，重定向的Interceptor
+    interceptors.add(retryAndFollowUpInterceptor);
+    // 添加一些请求的头部或者其他信息
+    // 并对返回的Response做一些友好的处理
+    interceptors.add(new BridgeInterceptor(client.cookieJar()));
+    // 判断缓存是否存在，读取缓存，更新缓存等等
+    interceptors.add(new CacheInterceptor(client.internalCache()));
+    // 建立客户端和服务器的连接
+    interceptors.add(new ConnectInterceptor(client));
+    if (!forWebSocket) {
+        // 添加开发者自定义的网络层拦截
+      interceptors.addAll(client.networkInterceptors());
+    }
+    // 向服务器发送数据，并且接收服务器返回的Response
+    interceptors.add(new CallServerInterceptor(forWebSocket));
+    // 一个包裹这request的chain
+    Interceptor.Chain chain = new RealInterceptorChain(
+        interceptors, null, null, null, 0, originalRequest);
+    //把chain传递到第一个Interceptor手中    
+    return chain.proceed(originalRequest);
+  }
+```
+到这里，我们通过源码已经可以总结一些在开发中需要注意的问题了：
+* Interceptor的执行的是顺序的，也就意味着当我们自己自定义Interceptor时是否应该注意添加的顺序呢？
+* 在开发者自定义拦截器时，是有两种不同的拦截器可以自定义的。
+
+接着，从上面最后两行代码讲起：
+
+首先创建了一个指向RealInterceptorChain这个实现类的chain引用，然后调用了 proceed（request）方法。
+
+```java
+public final class RealInterceptorChain implements Interceptor.Chain {
+  private final List<Interceptor> interceptors;
+  private final StreamAllocation streamAllocation;
+  private final HttpCodec httpCodec;
+  private final Connection connection;
+  private final int index;
+  private final Request request;
+  private int calls;
+
+  public RealInterceptorChain(List<Interceptor> interceptors, StreamAllocation streamAllocation,
+      HttpCodec httpCodec, Connection connection, int index, Request request) {
+    this.interceptors = interceptors;
+    this.connection = connection;
+    this.streamAllocation = streamAllocation;
+    this.httpCodec = httpCodec;
+    this.index = index;
+    this.request = request;
+  }
+  ....
+  ....
+  ....
+ @Override
+ public Response proceed(Request request) throws IOException {
+            //直接调用了下面的proceed（.....）方法。
+    return proceed(request, streamAllocation, httpCodec, connection);
+  }
+
+    //这个方法用来获取list中下一个Interceptor，并调用它的intercept（）方法
+  public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec,
+      Connection connection) throws IOException {
+    if (index >= interceptors.size()) throw new AssertionError();
+
+    calls++;
+    ....
+    ....
+    ....
+
+    // Call the next interceptor in the chain.
+    RealInterceptorChain next = new RealInterceptorChain(
+        interceptors, streamAllocation, httpCodec, connection, index + 1, request);
+    //从list中获取到第一个Interceptor
+    Interceptor interceptor = interceptors.get(index);
+    //然后调用这个Interceptor的intercept（）方法，并等待返回Response
+    Response response = interceptor.intercept(next);
+    ....
+    ....
+    return response;
+  }
+```
+如果你还是好奇OKHttp到底是怎么发出请求？
+我可以做一点简短的介绍：这个请求动作发生在CallServerInterceptor（也就是最后一个Interceptor）中，而且其中还涉及到Okio这个io框架，通过Okio封装了流的读写操作，可以更加方便，快速的访问、存储和处理数据。最终请求调用到了socket这个层次,然后获得Response。
+
+### 两个版本之间的区别
+在或之前的源码中，从请求到响应会嵌套了很多方法，并且有两个 chain，一个传给 interceptor，一个传给 networkinterceptor，并且两个 interceptor 处理的位置都不一样，光 networkinterceptor 的调用位置我都找了半天，总之看代码真的需要耐心，现在只通过一个 chain 并且通过不断传给在不同顺序的 interceptor，每个 interceptor 做不同的操作来解决整个操作，逻辑清晰
 
 # 相关链接
 [OkHttp3 源码浅析](http://w4lle.github.io/2016/12/06/OkHttp/)
