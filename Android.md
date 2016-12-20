@@ -46,7 +46,7 @@
 ## 资源相关
 ### Resourc
 ### R文件相关
-### Drawable
+### [Drawable](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Drawable.md)
 ### mipmap
 ### 换肤/夜间模式
 
@@ -81,10 +81,8 @@
 ### tcp/udp
 ### Retrofit， OkHttp， Volley
 * [Okhttpの缓存配置](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/OKHttp%E3%81%AE%E7%BC%93%E5%AD%98%E9%85%8D%E7%BD%AE.md)
-<<<<<<< HEAD
-* Okhttp源码解析
-=======
->>>>>>> 83ab46263740ca395fe24e0285b55bf4c4fd9515
+* [Okhttp源码解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/OkHttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)
+
 
 -----
 ## 图片
