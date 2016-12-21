@@ -161,6 +161,9 @@
 ### Orm
 ### EventBus
 ### RxJava
+### Dagger2
+* [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/dagger.md)
+* [Dagger2生成代码分析](#)
 
 ---
 ## 相关链接
