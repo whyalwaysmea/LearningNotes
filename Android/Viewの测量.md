@@ -121,7 +121,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
    return View.MeasureSpec.makeMeasureSpec(resultSize, resultMode);
 }
 ```
-上述方法不难理解，它的主要作用是根据父容器的MeasureSpec同时结合View本身的LayoutParams来确定子元素的MeasureSpec. 
+上述方法不难理解，它的主要作用是根据父容器的MeasureSpec同时结合View本身的LayoutParams来确定子元素的MeasureSpec.
 该方法就是确定子View的MeasureSpec的具体实现。
 ![](http://img.blog.csdn.net/20160510112048981)
 
@@ -252,6 +252,98 @@ viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutLi
 
 4.view.measure(int widthMeasureSpec, int heightMeasureSpec);
 通过手动对View进行measure来得到View的宽/高。
+
+# ScrollView嵌套ListView问题解析
+在ScrollView中嵌套ListView显示是不正常的，确切地说是只会显示ListView的第一个项。
+那么为什么会造成这样的显示不正常呢？ 我们应该能够想到，是ListView在测量自己高度的时候出现了问题，但是我们知道子View的测量模式是由父View决定的，那么我们就先来查看一下ScrollView的源码
+```java
+// ScrollView.java
+@Override
+protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, int widthUsed,
+        int parentHeightMeasureSpec, int heightUsed) {
+    final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+    final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+            mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin
+                    + widthUsed, lp.width);
+    final int usedTotal = mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin +
+            heightUsed;
+    // 在这里可以看出来，ScrollView将子View的测量模式指定为了MeasureSpec.UNSPECIFIED        
+    final int childHeightMeasureSpec = MeasureSpec.makeSafeMeasureSpec(
+            Math.max(0, MeasureSpec.getSize(parentHeightMeasureSpec) - usedTotal),
+            MeasureSpec.UNSPECIFIED);
+
+    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+}
+```
+现在我们知道了ListView的测量模式了，所以就来看看ListView的测量方法吧
+```java
+@Override
+// ListView.java
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    // Sets up mListPadding
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+    final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+    final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+    int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+    int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+    int childWidth = 0;
+    int childHeight = 0;
+    int childState = 0;
+
+    mItemCount = mAdapter == null ? 0 : mAdapter.getCount();
+    if (mItemCount > 0 && (widthMode == MeasureSpec.UNSPECIFIED
+            || heightMode == MeasureSpec.UNSPECIFIED)) {
+        final View child = obtainView(0, mIsScrap);
+
+        // Lay out child directly against the parent measure spec so that
+        // we can obtain exected minimum width and height.
+        measureScrapChild(child, 0, widthMeasureSpec, heightSize);
+
+        childWidth = child.getMeasuredWidth();
+        childHeight = child.getMeasuredHeight();
+        childState = combineMeasuredStates(childState, child.getMeasuredState());
+
+        if (recycleOnMeasure() && mRecycler.shouldRecycleViewType(
+                ((LayoutParams) child.getLayoutParams()).viewType)) {
+            mRecycler.addScrapView(child, 0);
+        }
+    }
+
+    if (widthMode == MeasureSpec.UNSPECIFIED) {
+        widthSize = mListPadding.left + mListPadding.right + childWidth +
+                getVerticalScrollbarWidth();
+    } else {
+        widthSize |= (childState & MEASURED_STATE_MASK);
+    }
+    // 通过这句话可以看出来，当ListView高的测量模式为MeasureSpec.UNSPECIFIED时，
+    // 高的值为padding + childHeight + getVerticalFadingEdgeLength() * 2
+    // 所以就导致了ScrollView中的ListView显示出现了问题
+    if (heightMode == MeasureSpec.UNSPECIFIED) {
+        heightSize = mListPadding.top + mListPadding.bottom + childHeight +
+                getVerticalFadingEdgeLength() * 2;
+    }
+
+    if (heightMode == MeasureSpec.AT_MOST) {
+        // TODO: after first layout we should maybe start at the first visible position, not 0
+        heightSize = measureHeightOfChildren(widthMeasureSpec, 0, NO_POSITION, heightSize, -1);
+    }
+
+    setMeasuredDimension(widthSize, heightSize);
+
+    mWidthMeasureSpec = widthMeasureSpec;
+}
+```
+那至于怎么解决这个问题就很明显了，我们只用重写一下ListView的onMeasure方法就好了
+```java
+@Override
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    int heightSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+    super.onMeasure(widthMeasureSpec, heightSpec);
+}
+```
 
 # 相关链接
 [自定义View系列教程02--onMeasure源码详尽分析](http://blog.csdn.net/lfdfhl/article/details/51347818)
