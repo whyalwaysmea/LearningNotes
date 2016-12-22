@@ -76,7 +76,7 @@ controller.setOrder(LayoutAnimationController.ORDER_NORMAL);
 listView.setLayoutAnimation(controller);
 ```
 
-## Activity的切换效果
+#### Activity的切换效果
 可以通过如下方式添加自定义的切换效果:
 ```Java
 Intent intent = new Intent(MainActivity.this, SecondActivity.class);
@@ -89,4 +89,25 @@ Fragment也可以添加切换动画，但是Fragment是在API 11中新引入的�
 ```Java
 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 fragmentTransaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+```
+
+## 帧动画
+帧动画是顺序播放一组预先定义好的图片。
+```Java
+// res/drawable/frame_animation.xml
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/item1" android:duration="100" />
+    <item android:drawable="@drawable/item2" android:duration="100" />
+    <item android:drawable="@drawable/item3" android:duration="100" />
+    <item android:drawable="@drawable/item4" android:duration="100" />
+    <item android:drawable="@drawable/item5" android:duration="100" />
+</animation-list>
+```
+使用:
+```Java
+TextView tv = (TextView) findViewById(R.id.tv);
+tv.setBackgroundResource(R.drawable.frame_animation);
+AnimationDrawable animationDrawable = (AnimationDrawable) tv.getBackground();
+animationDrawable.start();
 ```
