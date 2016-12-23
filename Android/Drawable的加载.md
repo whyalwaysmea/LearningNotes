@@ -34,7 +34,8 @@ Android系统在利用drawable中的图片生成Bitmap时默认采用的色彩�
 
 # show Code
 既然已经知道了图片加载的规则，那么我们再从源码(Lollipop 5.0)角度来看看当加载drawable中的图片时的具体实现
-1. 调用BitmapFactory中的的decodeResource()加载drawable文件夹里的图片，源码如下：
+
+1.调用BitmapFactory中的的decodeResource()加载drawable文件夹里的图片，源码如下：
 ```Java
 public static Bitmap decodeResource(Resources res, int id, Options opts) {
     Bitmap bm = null;
@@ -66,7 +67,7 @@ public static Bitmap decodeResource(Resources res, int id, Options opts) {
     return bm;
 }
 ```
-2. 调用decodeResourceStream( )方法
+2.调用decodeResourceStream( )方法
 ```Java
 public static Bitmap decodeResourceStream(Resources res, TypedValue value,
             InputStream is, Rect pad, Options opts) {
@@ -91,7 +92,7 @@ public static Bitmap decodeResourceStream(Resources res, TypedValue value,
     return decodeStream(is, pad, opts);
 }
 ```
-3. 调用decodeStream()方法
+3.调用decodeStream()方法
 在该方法中会调用decodeStreamInternal()；它又会继续调用nativeDecodeStream( )，该方法是native的；在BitmapFactory.cpp可见这个方法内部又调用了doDecode()它的核心源码如下：
 ```cpp
 static jobject doDecode(JNIEnv*env,SkStreamRewindable*stream,jobject padding,jobject options) {
