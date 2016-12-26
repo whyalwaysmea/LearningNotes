@@ -35,11 +35,14 @@
 ## View相关
 ### [View基础知识](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
 ### [View的滑动](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E7%9A%84%E6%BB%91%E5%8A%A8.md)
-### [View的测量--onMeasure](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E7%9A%84%E6%B5%8B%E9%87%8F.md)
+### [View的测量--onMeasure](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E3%81%AE%E6%B5%8B%E9%87%8F.md)
 ### [View的onLayout](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/layout%E5%88%86%E6%9E%90.md)
 ### [ViewのTouch事件](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E3%81%AETouch%E4%BA%8B%E4%BB%B6.md)
+### [ViewのDraw](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E3%81%AEDraw.md)
 ### 自定义View
 ### 动画
+* [View动画&帧动画](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E5%8A%A8%E7%94%BB.md)
+* [属性动画](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.md)
 ### [Android ListView与RecyclerView对比浅析--缓存机制](http://dev.qq.com/topic/5811d3e3ab10c62013697408)
 
 ----
