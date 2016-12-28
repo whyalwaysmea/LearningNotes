@@ -25,7 +25,7 @@
 * [Flags](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Activity%20Flags.md)
 * [IntentFilter的匹配规则](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/IntentFilter%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99.md)
 
-### Window
+### [Window和WindowManager](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Window%E5%92%8CWindowManager.md)
 ### Handler
 
 ### [Android中的Manager](http://www.jianshu.com/p/10a72ee2bb84#)
@@ -39,10 +39,10 @@
 ### [View的onLayout](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/layout%E5%88%86%E6%9E%90.md)
 ### [ViewのTouch事件](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E3%81%AETouch%E4%BA%8B%E4%BB%B6.md)
 ### [ViewのDraw](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E3%81%AEDraw.md)
-### 自定义View
 ### 动画
 * [View动画&帧动画](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/View%E5%8A%A8%E7%94%BB.md)
 * [属性动画](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.md)
+
 ### [Android ListView与RecyclerView对比浅析--缓存机制](http://dev.qq.com/topic/5811d3e3ab10c62013697408)
 
 ----
