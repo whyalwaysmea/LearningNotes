@@ -82,3 +82,289 @@ Toast属于系统Window，它内部的视图由两种方式指定：一种是系
 Toast具有定时取消功能，所以系统采用了Handler。Toast的显示和隐藏是IPC过程，都需要NotificationManagerService来实现。在Toast和NMS进行IPC过程时，NMS会跨进程回调Toast中的TN类中的方法，TN类是一个Binder类，运行在Binder线程池中，所以需要通过Handler将其切换到当前发送Toast请求所在的线程，所以Toast无法在没有Looper的线程中弹出。
 
 对于非系统应用来说，mToastQueue最多能同时存在50个ToastRecord，这样做是为了防止DOS(Denial of Service，拒绝服务)。因为如果某个应用弹出太多的Toast会导致其他应用没有机会弹出Toast。
+
+#### 关于Toast在子线程中使用报错
+在子线程中使用Toast抛出异常，提示错误显示:Can't create handler inside thread that has not called Looper.prepare()
+
+其实问题没那么复杂，直接从代码分析原因即可。
+先看Toast.makeText(Context,CharSequence,int)的源码:
+```java
+public static Toast makeText(Context context, CharSequence text, @Duration int duration) {
+    Toast result = new Toast(context);
+
+    LayoutInflater inflate = (LayoutInflater)
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    View v = inflate.inflate(com.android.internal.R.layout.transient_notification, null);
+    TextView tv = (TextView)v.findViewById(com.android.internal.R.id.message);
+    tv.setText(text);
+
+    result.mNextView = v;
+    result.mDuration = duration;
+
+    return result;
+}
+```
+这里就是初始化View并给Toast赋值，但是这里并没有涉及Handler,为什么会出现“Can't create handler inside thread that has not called Looper.prepare()”这样的错误呢？
+
+其实是在Toast的构造方法中:
+```java
+public Toast(Context context) {
+    mContext = context;
+    mTN = new TN();
+    mTN.mY = context.getResources().getDimensionPixelSize(
+            com.android.internal.R.dimen.toast_y_offset);
+    mTN.mGravity = context.getResources().getInteger(
+            com.android.internal.R.integer.config_toastDefaultGravity);
+}
+```
+接着看看TN这个类
+```java
+private static class TN extends ITransientNotification.Stub {
+    final Runnable mShow = new Runnable() {
+        @Override
+        public void run() {
+            handleShow();
+        }
+    };
+
+    final Runnable mHide = new Runnable() {
+        @Override
+        public void run() {
+            handleHide();
+            // Don't do this in handleHide() because it is also invoked by handleShow()
+            mNextView = null;
+        }
+    };
+
+    private final WindowManager.LayoutParams mParams = new WindowManager.LayoutParams();
+    // 会在TN的构造方法之前执行，从而导致在Toast()中抛出异常。
+    final Handler mHandler = new Handler();
+
+    int mGravity;
+    int mX, mY;
+    float mHorizontalMargin;
+    float mVerticalMargin;
+
+
+    View mView;
+    View mNextView;
+    int mDuration;
+
+    WindowManager mWM;
+
+    static final long SHORT_DURATION_TIMEOUT = 5000;
+    static final long LONG_DURATION_TIMEOUT = 1000;
+
+    TN() {
+        ...
+    }
+
+    /**
+     * schedule handleShow into the right thread
+     */
+    @Override
+    public void show() {
+        if (localLOGV) Log.v(TAG, "SHOW: " + this);
+        mHandler.post(mShow);
+    }
+
+    /**
+     * schedule handleHide into the right thread
+     */
+    @Override
+    public void hide() {
+        if (localLOGV) Log.v(TAG, "HIDE: " + this);
+        mHandler.post(mHide);
+    }
+
+    ...
+}
+```
+所以到这里就可以看出为什么会崩溃了，因为在show()之前，Toast的初始化方法中，TN初始化之前，new了一个Handler从而导致异常。
+Toast本质上是一个window，跟activity是平级的，checkThread只是Activity维护的View树的行为。
+
+Toast使用的无所谓是不是主线程Handler，吐司操作的是window，不属于checkThread抛主线程不能更新UI异常的管理范畴。它用Handler只是为了用队列和时间控制排队显示吐司。所以Toast无法在没有Looper的线程中弹出，这是因为Handler需要使用Looper才能完成切换线程的功能。
+
+
+解决这个问题，我们先通过源码来具体探究一下：
+我们先看Toast的显示过程
+```java
+public void show() {
+    if (mNextView == null) {
+        throw new RuntimeException("setView must have been called");
+    }
+
+    INotificationManager service = getService();
+    String pkg = mContext.getOpPackageName();
+    TN tn = mTN;
+    tn.mNextView = mNextView;
+
+    try {        
+        service.enqueueToast(pkg, tn, mDuration);
+    } catch (RemoteException e) {
+        // Empty
+    }
+}
+
+static private INotificationManager getService() {
+    if (sService != null) {
+        return sService;
+    }
+    sService = INotificationManager.Stub.asInterface(ServiceManager.getService("notification"));
+    return sService;
+}
+```
+其中的INotificationManager是NotificationManagerService, 而且getService是一个非常典型的Binder通信
+```java
+// 第一个参数表示当前应用的包名
+// 第二个参数表示远程回调
+// 第三个参数表示toast的时长
+public void enqueueToast(String pkg, ITransientNotification callback, int duration) {
+    if (pkg == null || callback == null) {
+        return ;
+    }
+
+    synchronized (mToastQueue) {
+        int callingPid = Binder.getCallingPid();
+        long callingId = Binder.clearCallingIdentity();
+        try {
+            ToastRecord record;
+            int index = indexOfToastLocked(pkg, callback);
+            // If it's already in the queue, we update it in place, we don't
+            // move it to the end of the queue.
+            if (index >= 0) {
+                record = mToastQueue.get(index);
+                record.update(duration);
+            } else {
+                record = new ToastRecord(callingPid, pkg, callback, duration);
+                mToastQueue.add(record);
+                index = mToastQueue.size() - 1;
+                keepProcessAliveLocked(callingPid);
+            }
+            // If it's at index 0, it's the current toast.  It doesn't matter if it's
+            // new or just been updated.  Call back and tell it to show itself.
+            // If the callback fails, this will remove it from the list, so don't
+            // assume that it's valid after this.
+            if (index == 0) {
+                showNextToastLocked();
+            }
+        } finally {
+            Binder.restoreCallingIdentity(callingId);
+        }
+    }
+}
+```
+enqueueToast首先将Toast请求封装为ToastRecord对象并将其添加到一个名为mToastQueue的队列中，mToastQueue其实是一个ArrayList。对于非系统应用来说，mToastQueue中最多能同时存在50个ToastRecord，这样做是为了防止DOS。
+当ToastRecord被添加到mToastQueue中后，NotificationManagerService就会通过showNextToastLocked方法来显示当前的Toast。
+```java
+void showNextToastLocked() {
+    ToastRecord record = mToastQueue.get(0);
+    while (record != null) {
+        if (DBG) Slog.d(TAG, "Show pkg=" + record.pkg + " callback=" + record.callback);
+        try {
+            // 这里就对应了远程回调的show
+            // 其实也就是TN类中的show()
+            record.callback.show();
+            // 显示之后，会调用该方法发送一个延时消息
+            scheduleTimeoutLocked(record);
+            return;
+        } catch (RemoteException e) {
+            Slog.w(TAG, "Object died trying to show notification " + record.callback
+                    + " in package " + record.pkg);
+            // remove it from the list and let the process die
+            int index = mToastQueue.indexOf(record);
+            if (index >= 0) {
+                mToastQueue.remove(index);
+            }
+            keepProcessAliveLocked(record.pid);
+            if (mToastQueue.size() > 0) {
+                record = mToastQueue.get(0);
+            } else {
+                record = null;
+            }
+        }
+    }
+}
+```
+我们先看看record.callback.show();也就是TN中的show()
+```java
+final Runnable mShow = new Runnable() {
+    @Override
+    public void run() {
+        handleShow();
+    }
+};
+// 这里才是真正显示toast的地方。这里才真正涉及到了更新UI操作
+public void handleShow() {
+    if (localLOGV) Log.v(TAG, "HANDLE SHOW: " + this + " mView=" + mView
+            + " mNextView=" + mNextView);
+    if (mView != mNextView) {
+        // remove the old view if necessary
+        handleHide();
+        mView = mNextView;
+        Context context = mView.getContext().getApplicationContext();
+        String packageName = mView.getContext().getOpPackageName();
+        if (context == null) {
+            context = mView.getContext();
+        }
+        mWM = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        // We can resolve the Gravity here by using the Locale for getting
+        // the layout direction
+        final Configuration config = mView.getContext().getResources().getConfiguration();
+        final int gravity = Gravity.getAbsoluteGravity(mGravity, config.getLayoutDirection());
+        mParams.gravity = gravity;
+        if ((gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.FILL_HORIZONTAL) {
+            mParams.horizontalWeight = 1.0f;
+        }
+        if ((gravity & Gravity.VERTICAL_GRAVITY_MASK) == Gravity.FILL_VERTICAL) {
+            mParams.verticalWeight = 1.0f;
+        }
+        mParams.x = mX;
+        mParams.y = mY;
+        mParams.verticalMargin = mVerticalMargin;
+        mParams.horizontalMargin = mHorizontalMargin;
+        mParams.packageName = packageName;
+        mParams.removeTimeoutMilliseconds = mDuration ==
+            Toast.LENGTH_LONG ? LONG_DURATION_TIMEOUT : SHORT_DURATION_TIMEOUT;
+        if (mView.getParent() != null) {
+            if (localLOGV) Log.v(TAG, "REMOVE! " + mView + " in " + this);
+            mWM.removeView(mView);
+        }
+        if (localLOGV) Log.v(TAG, "ADD! " + mView + " in " + this);
+        // 在真正真正的将Toast添加上去
+        mWM.addView(mView, mParams);
+        trySendAccessibilityEvent();
+    }
+}
+```
+接下来再看看,NMS发送的一个延时消息
+```java
+private void scheduleTimeoutLocked(ToastRecord r)
+{
+    mHandler.removeCallbacksAndMessages(r);
+    Message m = Message.obtain(mHandler, MESSAGE_TIMEOUT, r);
+    // 在这里控制Toast的显示时长，LONG_DELAY是3.5s，SHORT_DELAY是2s
+    long delay = r.duration == Toast.LENGTH_LONG ? LONG_DELAY : SHORT_DELAY;
+    mHandler.sendMessageDelayed(m, delay);
+}
+```
+延迟相应的时间后，NMS会通过cancelToastLocked方法来隐藏Toast，并将其从mToastQueue中移除，这个时候如果mToastQueue中还有其他Toast，那么NMS就继续显示其他Toast。
+
+##### 解决办法
+最简单的方法：
+```java
+new Thread(){
+  public void run(){
+    Looper.prepare();//给当前线程初始化Looper
+    Toast.makeText(getApplicationContext(),"你猜我能不能弹出来～～",0).show();//Toast初始化的时候会new Handler();无参构造默认获取当前线程的Looper，如果没有prepare过，则抛出题主描述的异常。上一句代码初始化过了，就不会出错。
+    Looper.loop();//这句执行，Toast排队show所依赖的Handler发出的消息就有人处理了，Toast就可以吐出来了。但是，这个Thread也阻塞这里了，因为loop()是个for (;;) ...
+  }
+}.start();
+```
+
+##### 总结
+Toast本质上是一个window，跟activity是平级的，checkThread只是Activity维护的View树的行为。
+
+Toast使用的无所谓是不是主线程Handler，吐司操作的是window，不属于checkThread抛主线程不能更新UI异常的管理范畴。它用Handler只是为了用队列和时间控制排队显示吐司。
+
+同时这里还涉及到两处IPC的知识，一个是NotificationManagerService的创建，一个是显示和隐藏Toast方法的调用。
