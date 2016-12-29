@@ -168,6 +168,8 @@
 ### Orm
 ### EventBus
 ### RxJava
+* <a href="https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/RxJava%E3%81%AEobserveOn()%E4%B8%8EsubscribeOn().md">线程调度</a>
+
 ### Dagger2
 * [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/dagger.md)
 * [Dagger2生成代码分析](#)

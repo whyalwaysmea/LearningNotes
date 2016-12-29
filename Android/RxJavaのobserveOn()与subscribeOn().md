@@ -179,4 +179,4 @@ Observable
 再简单点总结就是
 subscribeOn的调用切换之前的线程。
 observeOn的调用切换之后的线程。
-observeOn之后，不可再调用subscribeOn 切换线程
+observeOn之后，不调用subscribeOn切换线程不再起作用，但是subscribeOn可以用于控制doOnSubscribe()的线程
