@@ -99,9 +99,11 @@
 ### 屏幕适配
 * [屏幕适配基础](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D.md)
 * [Drawable加载](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Drawable%E7%9A%84%E5%8A%A0%E8%BD%BD.md)
+
 ### 系统版本适配
 ### 语言国际化
 ### Room适配
+
 ---
 ## JNI与NDK
 
