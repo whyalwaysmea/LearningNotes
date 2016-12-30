@@ -288,17 +288,19 @@ public @interface PerActivity {
 
 ## 简单案例5 #dependencies
 在实际开发中,我们经常会使用到工具类,工具类一般在整个App的生命周期内都是单例的,我们现在给我们的Demo添加一个工具类ClothHandler:
-``java
+```java
 public class ClothHandler {
     public Shoe handle(Cloth cloth){
         return new Shoe(cloth);
     }
 }
 ```
+
 它的功能就是将cloth加工成clothes,假设我们现在有两个Activity中都要使用该工具类,我们要怎么使用Dagger2帮我们注入呢?
 可能有人会想到在module中提供ClothHandler就可以了，现在只有两个Activity使用到了ClothHandler，如果有20个Activity都用到了ClothHandler，难道不成要写20个？况且我们更希望这个工具类是以单例的形式存在
 事实上是当然不用的
 在面向对象的思想中,我们碰到这种情况一般都要抽取父类,Dagger2也是用的这种思想,我们先创建一个BaseModule,用来提供工具类:
+
 ```java
 @Module
 public class BaseModule {
