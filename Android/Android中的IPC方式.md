@@ -131,8 +131,44 @@ public class BookManagerActivity extends AppCompatActivity {
 AIDL中能够使用的List只有ArrayList，但是我们这里却使用了CopyOnWriteArrayList（注意它并不是继承自ArrayList）。这是因为AIDL中所支持的是抽象的List，而List只是一个接口，因此虽然服务端返回的是CopyOnWriteArrayList，但是在Binder中会按照List的规范去访问数据并最终形成一个ArrayList传递给客户端。
 
 
+### RemoteCallbackList
+RemoteCallbackList是系统专门提供的用于删除跨进程Listener的接口。RemoteCallbackList是一个泛型，支持管理任意的AIDL接口，因为所有的AIDL接口都继承自IInterface接口。
 
+### 注意
+客户端调用远程服务的方法，被调用的方法运行在服务端的Binder线程池中，同时客户端线程会被挂起，这个时候如果服务端方法执行比较耗时，就会导致客户端线程长时间地阻塞，如果这个客户端线程是UI线程的话，就会导致客户端ANR。所以，如果我们明确知道某个远程方法是耗时的，那么就要避免在客户端的UI线程中去访问远程的耗时方法。
 
+同理，当远程服务端需要调用客户端的方法时，被调用的方法也运行在Binder线程池中，只不过是客户端的线程池。所以，我们同样不可以在服务端中调用客户端的耗时方法。
+
+Binder是可能意外死亡的，由于服务端进程意外停止了，这时我们需要重新连接服务。
+
+1. 给Binder设备DeathRecipient监听
+2. 在onServiceDisconnected中重连远程服务。
+
+两者的区别是：onServiceDisconnected在客户端的UI线程中被回调，而binderDied在客户端的Binder线程池中被回调。
+
+### 权限验证
+默认情况下，我们的远程服务任何人都可以连接，但这以你哥哥不是我们愿意看到的，所以我们必须加入权限验证功能。
+
+1.在onBind中进行验证，验证不通过就直接返回null。比如使用permission验证
+```
+<permission
+        android:name="com.whyalwaysmea.permission.ACCESS_BOOK_SERVICE"
+        android:protectionLevel="normal" />
+
+public IBinder onbind(Intent intent) {
+    int check = checkCallingOrSelfPermission("com.whyalwaysmea.permission.ACCESS_BOOK_SERVICE");
+    if(check == PackageManager.PERMISSION_DENIED) {
+        return null;
+    }
+    return mBinder;
+}        
+```
+如果我们自己的应用想绑定到服务上，只需要在它的AndroidMenifest文件中采用如下方式使用permission
+```
+<uses-permission android:name="com.whyalwaysmea.permission.ACCESS_BOOK_SERVICE" />
+```
+
+2.我们可以在服务端的onTransact方法中进行权限验证，如果验证失败就返回false，这样服务端就不会终止执行AIDL中的方法从而达到保护客户端的效果。这里可以验证的方式很多，比如permission，Uid，Pid等验证。
 
 ## 使用ContentProvider
 ContentProvider是Android中提供的专门用于不同应用间进行数据共享的方式，它的底层实现同样也是Binder。
