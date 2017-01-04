@@ -20,6 +20,7 @@ Linux上可以通过命名管道、共享内存、信号量等来进行进程间
 
 # Android中的多进程模式
 我们必须要先理解Android中的多进程模式。通过给四大组件指定`android:process`属性，我们可以轻易地开启多进程模式。
+也就是说我们无法给一个线程或者一个实体类指定其运行时所在的进程。当然，我们也可以通过JNI在native层去fork一个新的进程。
 ```xml
 <activity
     android:name=".MainActivity"

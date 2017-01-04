@@ -4,6 +4,7 @@
 
 1. 生成的apk在android 2.3或之前的机器上无法安装，提示INSTALL_FAILED_DEXOPT
 2. 方法数量过多，编译时出错，提示：
+
 > Conversion to Dalvik format failed:Unable to execute dex: method ID not in [0, 0xffff]: 65536
 
 而问题的产生原因如下：
@@ -19,7 +20,7 @@
 # MultiDex的使用
 
 # MultiDex的坑
-#### 启动时间过长
+### 启动时间过长
 由于应用启动时会加载额外的dex文件，这将导致应用的启动速度降低。
 Application.attachBaseContext是我们能控制的最早执行的代码，在这个方法里面执行MultiDex.install()无疑是最佳时机。
 还有一点我们需要了解，首次启动时Dalvik虚拟机会对classes.dex执行dexopt操作，生成ODEX文件，这个过程非常耗时，而执行MultiDex.install()必然会再次对classes2.dex执行dexopt等操作，所有这些操作必须在5秒内完成，否则就ANR给你看！因此应该避免其他的dex文件过大
@@ -54,10 +55,10 @@ initAfterDex2Installed()方法是根据Classes2.dex中结果，将涉及到的�
 
 建议在classes2.dex加载完成前，设置一个启动等待界面，之后再进入主界面，确保用户体验。
 
-#### ANR/Crash
+### ANR/Crash
 在冷启动时因为需要安装DEX文件，如果DEX文件过大时，处理时间过长，很容易引发ANR（Application Not Responding）；
 
-#### 4.0之前的bug
+### 4.0之前的bug
 由于Dalvik linearAlloc的bug，这可能导致使用MultiDex的应用无法在Android4.0以前的手机上运行，因此需要做大量的兼容性测试。同时由于Dalvik linearAlloc的bug，有可能出现应用在运行中采用了MultiDex方案从而产生大量的内存消耗情况，这会导致应用崩溃。但是这种现象目前极少遇到。
 
 
@@ -70,7 +71,7 @@ initAfterDex2Installed()方法是根据Classes2.dex中结果，将涉及到的�
 2. 如果做到动态加载，怎么决定哪些DEX动态加载呢？
 3. 如果启动后在工作线程中做动态加载，如果没有加载完而用户进行页面操作需要使用到动态加载DEX中的class怎么办？
 
-#### 解决办法
+### 解决办法
 1. 为了实现产生多个DEX包，我们可以在生成DEX文件的这一步中， 在Ant或gradle中自定义一个Task来干预DEX产生的过程，从而产生多个DEX
 2. 寻找启动类.这个需要分析出放到Main DEX中的class依赖，需要确保把Main DEX中class所有的依赖都要放进来，否则在启动时会发生ClassNotFoundException。
 3. 如果我们在后台加载Secondary DEX过程中，用户点击界面将要跳转到使用了在Secondary DEX中class的界面， 那此时必然发生ClassNotFoundException, 那怎么解决这个问题呢，在所有的Activity跳转代码处添加判断Secondary DEX是否加载完成？这个方法可行，但工作量非常大;那有没有更好的解决方案呢？我们通过分析Activity的启动过程，发现Activity是由ActivityThread 通过Instrumentation来启动的，我们是否可以在Instrumentation中做一定的手脚呢？通过分析代码ActivityThread和Instrumentation发现，Instrumentation有关Activity启动相关的方法大概有：execStartActivity、newActivity等等，这样我们就可以在这些方法中添加代码逻辑进行判断这个Class是否加载了，如果加载则直接启动这个Activity，如果没有加载完成则启动一个等待的Activity显示给用户，然后在这个Activity中等待后台Secondary DEX加载完成，完成后自动跳转到用户实际要跳转的Activity
