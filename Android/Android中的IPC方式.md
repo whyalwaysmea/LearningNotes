@@ -177,12 +177,35 @@ ContentProvider是Android中提供的专门用于不同应用间进行数据共�
 
 关于自定义ContentProvider的过程：
 
-1. 创建一个自定义的ContentProvider，名字就叫BookProvider，只需要继承ContentProvider类并实现六个抽象方法即可：onCreate、query、update、insert、delete和geType。除了onCreate由系统回调并运行在主线程里，其他五个方法均由外界回调并运行在Binder线程池中。
+1.创建一个自定义的ContentProvider，名字就叫BookProvider，只需要继承ContentProvider类并实现六个抽象方法即可：onCreate、query、update、insert、delete和geType。除了onCreate由系统回调并运行在主线程里，其他五个方法均由外界回调并运行在Binder线程池中。
 
-2. 注册ContentProvider。
+2.注册ContentProvider。
+```xml
+<provider
+    // ContentProvider的唯一标识，通过这个属性外部应用就可以访问我们的BookProvider
+    android:authorities="com.whyalwaysmea.ipc.provider.BookProvider"
+    android:name=".provider.BookProvider"
+    android:permission="com.whyalwaysmea.provider"  // 权限
+    android:process=":provider"/>
+```
 
-3. 通过外部应用访问BookProvider。
+3.通过外部应用访问BookProvider。
 
+#### 注意
+
+1. ContentProvider主要以表格的形式来组织数据，并且可以包含多个表；
+2. ContentProvider还支持文件数据，比如图片、视频等，系统提供的MediaStore就是文件类型的ContentProvider；
+3. ContentProvider对底层的数据存储方式没有任何要求，可以是SQLite、文件，甚至是内存中的一个对象都行；
+4. 要观察ContentProvider中的数据变化情况，可以通过ContentResolver的registerContentObserver方法来注册观察者；
+5. query,update,insert,delete四大方法是存在多线程并发访问的，因此方法内部要做好线程同步。
 
 
 ## 使用Socket
+
+
+## Binder连接池
+当项目规模很大的时候，创建很多个Service是不对的做法，因为service是系统资源，太多的service会使得应用看起来很重，所以最好是将所有的AIDL放在同一个Service中去管理。
+整个工作机制是：每个业务模块创建自己的AIDL接口并实现此接口，这个时候不同业务模块之间是不能有耦合的，所有实现细节我们要单独开来，然后向服务端提供自己的唯一标识和其对应的Binder对象；对于服务端来说，只需要一个Service，服务端提供一个queryBinder接口，这个接口能够根据业务模块的特征来返回相应的Binder对象给它们，不同的业务模块拿到所需的Binder对象后就可以进行远程方法调用了。
+
+## 选择合适的IPC方式
+![选择合适的IPC方式](https://hujiaweibujidao.github.io/images/androidart_ipc.png)
