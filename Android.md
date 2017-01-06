@@ -5,7 +5,7 @@
 ### Activity
 * [生命周期](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Activity.md)
 * [启动模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Activity%20launchMode.md)
-* Activity的工作过程
+* [Activity的工作过程](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B.md)
 
 
 ### Service
