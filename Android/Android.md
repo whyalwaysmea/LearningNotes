@@ -27,8 +27,7 @@
 
 ### [Window和WindowManager](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Window%E5%92%8CWindowManager.md)
 
-### Android的消息机制
-
+### [Android的消息机制](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E7%9A%84%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6.md)
 
 ### [Android中的Manager](http://www.jianshu.com/p/10a72ee2bb84#)
 
