@@ -1,0 +1,5 @@
+# PendingIntent介绍
+PendingIntent从名字上看起来就和Intent有些类似，它们之间也确实存在着不少共同点。比如它们都可以去指明某一个“意图”，都可以用于启动活动、服务、以及发送广播等。
+不同的是，Intent更加倾向于立即执行某个动作，而PendingIntent更加倾向于在某个合适的时间去执行某个动作。所以，也可以把PendingIntent简单地理解为延迟执行的Intent。
+
+# PendingIntent使用
