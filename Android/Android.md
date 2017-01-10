@@ -26,7 +26,9 @@
 * [IntentFilter的匹配规则](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/IntentFilter%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99.md)
 
 ### [Window和WindowManager](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Window%E5%92%8CWindowManager.md)
-### Handler
+
+### Android的消息机制
+
 
 ### [Android中的Manager](http://www.jianshu.com/p/10a72ee2bb84#)
 

@@ -2,6 +2,10 @@
 View是一种界面层的控件的一种抽象，它代表了一个控件。除了View，还有ViewGroup。
 ViewGroup也继承了View，这就意味着View本身就可以是单个控件也可以是由多个控件组成的一组控件。
 
+# 初始ViewRoot和DecorView
+ViewRoot对应于ViewRootImpl类，它是连接WindowManager和DecorView的纽带，View的三大流程均是通过ViewRoot来完成的。
+在ActivityThread中，当Activity对象被创建完毕后，会将DecorView添加到Window中，同时会创建ViewRootImpl对象，并将ViewRootImpl对象和DecorView建立关联。
+
 # View的位置参数
 View的位置主要由它的四个顶点来决定，分别对应于View的四个属性：top、left、right、bottom。
 这些坐标都是相当于View的父容器来说的，因此它是一种相对坐标。
