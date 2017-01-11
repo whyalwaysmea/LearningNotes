@@ -43,3 +43,76 @@ AsyncTask在具体的使用过程中还有一些限制
 6. 在Android 1.6之前，AsyncTask是串行执行任务的，Android 1.6的时候AsyncTask开始采用线程池并行处理任务，但是从Android 3.0开始，为了避免AsyncTask带来的并发错误，AsyncTask又采用一个线程来串行执行任务。尽管如此，在Android 3.0以及后续版本中，我们可以使用AsyncTask的executeOnExecutor方法来并行执行任务。但是这个方法是Android 3.0新添加的方法，并不能在低版本上使用。
 
 ### AsyncTask的工作原理
+为了分析AsyncTask的工作原理，我们从它的execute方法开始分析，该方法又会调用executeOnExecutor
+```Java
+public final AsyncTask<Params, Progress, Result> execute(Params... params) {
+    // sDefaultExecutor实际上是一个串行的线程池
+    // 一个进程中所有的AsyncTask全部在这个串行的线程池中排队执行
+    return executeOnExecutor(sDefaultExecutor, params);
+}
+
+public final AsyncTask<Params, Progress, Result> executeOnExecutor(Executor exec,
+            Params... params) {
+    if (mStatus != Status.PENDING) {
+        switch (mStatus) {
+            case RUNNING:
+                throw new IllegalStateException("Cannot execute task:"
+                        + " the task is already running.");
+            case FINISHED:
+                throw new IllegalStateException("Cannot execute task:"
+                        + " the task has already been executed "
+                        + "(a task can be executed only once)");
+        }
+    }
+
+    mStatus = Status.RUNNING;
+    // 可以看出，该方法最先执行
+    onPreExecute();
+
+    mWorker.mParams = params;
+    // 线程池开始执行
+    exec.execute(mFuture);
+
+    return this;
+}
+```
+```Java
+/**
+ * An {@link Executor} that executes tasks one at a time in serial
+ * order.  This serialization is global to a particular process.
+ */
+public static final Executor SERIAL_EXECUTOR = new SerialExecutor();
+
+private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;
+
+private static class SerialExecutor implements Executor {
+    final ArrayDeque<Runnable> mTasks = new ArrayDeque<Runnable>();
+    Runnable mActive;
+
+    public synchronized void execute(final Runnable r) {
+        mTasks.offer(new Runnable() {
+            public void run() {
+                try {
+                    r.run();
+                } finally {
+                    scheduleNext();
+                }
+            }
+        });
+        if (mActive == null) {
+            scheduleNext();
+        }
+    }
+
+    protected synchronized void scheduleNext() {
+        if ((mActive = mTasks.poll()) != null) {
+            THREAD_POOL_EXECUTOR.execute(mActive);
+        }
+    }
+}
+```
+系统先把AsyncTask的Params的参数封装成为FutureTask对象，FutureTask是一个并发类，在这里它充当了Runnable的作用。
+接着这个FutureTask会交给SerialExecutor的execute方法去处理
+execute方法首先会把FutureTask对象插入到任务队列mTasks中，如果这个时候没有正在活动的AsyncTask任务，那么就会调用SerialExecutor的scheduleNext方法来执行下一个AsyncTask任务。
+同时当一个AsyncTask任务执行完后，AsyncTask会继续执行其他任务直到所有的任务都被执行为止。
+在默认情况下，AsyncTask是串行执行的。
