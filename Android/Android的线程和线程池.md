@@ -16,7 +16,7 @@ AsyncTask是一种轻量级的异步任务类，它可以在线程池中执行�
 * Progress: 表示后台任务的执行进度的类型
 * Result: 表示后台任务的返回结果的类型
 */
-public abstract class AsyncTask<Params, Progress, Result> ｛
+public abstract class AsyncTask<Params, Progress, Result> {
 
     // 在主线程中执行，在异步任务执行之前，此方法会被调用，一般可以用于做一些准备工作
     protected void onPreExecute();
@@ -31,9 +31,10 @@ public abstract class AsyncTask<Params, Progress, Result> ｛
 
     // 在主线程中执行，在异步任务执行之后，此方法会被调用，其中result参数是后台任务的返回值，即doInBackground的返回值
     protected void onPostExecute(Result result);
-｝
+}
 ```
 AsyncTask在具体的使用过程中还有一些限制
+
 1. AsyncTask的类必须在主线程中加载，这个过程在Android 4.1及以上版本中已经被系统自动完成。
 2. AsyncTask对象必须在主线程中创建，
 3. execute方法必须在UI线程中调用。
