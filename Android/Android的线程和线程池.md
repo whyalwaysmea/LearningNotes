@@ -111,12 +111,72 @@ private static class SerialExecutor implements Executor {
     }
 }
 ```
-系统先把AsyncTask的Params的参数封装成为FutureTask对象，FutureTask是一个并发类，在这里它充当了Runnable的作用。
 
-接着这个FutureTask会交给SerialExecutor的execute方法去处理
-
-execute方法首先会把FutureTask对象插入到任务队列mTasks中，如果这个时候没有正在活动的AsyncTask任务，那么就会调用SerialExecutor的scheduleNext方法来执行下一个AsyncTask任务。
-
-同时当一个AsyncTask任务执行完后，AsyncTask会继续执行其他任务直到所有的任务都被执行为止。
+1. 系统先把AsyncTask的Params的参数封装成为FutureTask对象，FutureTask是一个并发类，在这里它充当了Runnable的作用。
+2. 接着这个FutureTask会交给SerialExecutor的execute方法去处理
+3. execute方法首先会把FutureTask对象插入到任务队列mTasks中，如果这个时候没有正在活动的AsyncTask任务，那么就会调用SerialExecutor的scheduleNext方法来执行下一个AsyncTask任务。
+4. 同时当一个AsyncTask任务执行完后，AsyncTask会继续执行其他任务直到所有的任务都被执行为止。
 
 在默认情况下，AsyncTask是串行执行的。
+
+AsyncTask中有两个线程池：SerialExecutor和THREAD_POOL_EXECUTOR。前者是用于任务的排队，默认是串行的线程池；后者用于真正执行任务。
+AsyncTask中还有一个Handler，即InternalHandler，用于将执行环境从线程池切换到主线程。
+AsyncTask内部就是通过InternalHandler来发送任务执行的进度以及执行结束等消息。
+在AsyncTask的构造方法中有如下一段代码，由于FutureTask的run方法会调用mWorker的call方法，因此mWorker的call方法最终会在线程池中执行
+```Java
+mWorker = new WorkerRunnable<Params, Result>() {
+    public Result call() throws Exception {
+        // 表明当前任务已经被调用过了
+        mTaskInvoked.set(true);
+
+        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        //noinspection unchecked
+        Result result = doInBackground(mParams);
+        Binder.flushPendingCommands();
+        return postResult(result);
+    }
+};
+
+private Result postResult(Result result) {
+    @SuppressWarnings("unchecked")
+    Message message = getHandler().obtainMessage(MESSAGE_POST_RESULT,
+            new AsyncTaskResult<Result>(this, result));
+    message.sendToTarget();
+    return result;
+}
+
+// 为了能够执行线程切换，所以AsyncTask就必须在主线程中加载
+private static InternalHandler sHandler;
+
+private static class InternalHandler extends Handler {
+    public InternalHandler() {
+        super(Looper.getMainLooper());
+    }
+
+    @SuppressWarnings({"unchecked", "RawUseOfParameterizedType"})
+    @Override
+    public void handleMessage(Message msg) {
+        AsyncTaskResult<?> result = (AsyncTaskResult<?>) msg.obj;
+        switch (msg.what) {
+            case MESSAGE_POST_RESULT:
+                // There is only one result
+                result.mTask.finish(result.mData[0]);
+                break;
+            case MESSAGE_POST_PROGRESS:
+                result.mTask.onProgressUpdate(result.mData);
+                break;
+        }
+    }
+}
+
+// 最后任务执行完了会调用该方法
+private void finish(Result result) {
+    // 如果任务被取消
+    if (isCancelled()) {
+        onCancelled(result);
+    } else {
+        onPostExecute(result);
+    }
+    mStatus = Status.FINISHED;
+}
+```
