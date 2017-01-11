@@ -53,6 +53,7 @@ public final AsyncTask<Params, Progress, Result> execute(Params... params) {
 
 public final AsyncTask<Params, Progress, Result> executeOnExecutor(Executor exec,
             Params... params) {
+    // 状态检查，一个AsyncTask对象只能执行一次，即只能调用一次execute方法
     if (mStatus != Status.PENDING) {
         switch (mStatus) {
             case RUNNING:
@@ -64,7 +65,7 @@ public final AsyncTask<Params, Progress, Result> executeOnExecutor(Executor exec
                         + "(a task can be executed only once)");
         }
     }
-
+    // 状态标记
     mStatus = Status.RUNNING;
     // 可以看出，该方法最先执行
     onPreExecute();
@@ -88,7 +89,7 @@ private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;
 private static class SerialExecutor implements Executor {
     final ArrayDeque<Runnable> mTasks = new ArrayDeque<Runnable>();
     Runnable mActive;
-
+    // 这里的Runnable，就是exec.execute(mFuture);的FutureTask
     public synchronized void execute(final Runnable r) {
         mTasks.offer(new Runnable() {
             public void run() {
@@ -105,7 +106,9 @@ private static class SerialExecutor implements Executor {
     }
 
     protected synchronized void scheduleNext() {
+        // 从mTasks队列中取出队首的一个Runnable任务叫做mActive
         if ((mActive = mTasks.poll()) != null) {
+            // 这里就进入线程池中去完成任务了
             THREAD_POOL_EXECUTOR.execute(mActive);
         }
     }
@@ -128,7 +131,7 @@ mWorker = new WorkerRunnable<Params, Result>() {
     public Result call() throws Exception {
         // 表明当前任务已经被调用过了
         mTaskInvoked.set(true);
-
+        // 将这个线程的优先级设为后台线程优先级
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
         //noinspection unchecked
         Result result = doInBackground(mParams);
@@ -180,3 +183,7 @@ private void finish(Result result) {
     mStatus = Status.FINISHED;
 }
 ```
+### 为什么AsyncTask不适合进行特别耗时的后台任务
+首先，默认的AsyncTask的线程池中的核心线程数是有限的，不管是和CPU数目有关还是以前的固定的5， 还是有一个数量的限制，因此不适合大量的后台任务处理，例如瀑布流图片的加载等。
+其次，AsyncTask类必须在主线程初始化，必须在主线程创建，因为return executeOnExecutor(sDefaultExecutor, params)这里也只能在UI线程走。
+最后，我们也讲到了，AsyncTask在3.0后改成了串行的，因此想真正做一些并行的后台任务，就不太适合了。
