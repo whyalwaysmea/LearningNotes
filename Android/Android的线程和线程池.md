@@ -112,7 +112,11 @@ private static class SerialExecutor implements Executor {
 }
 ```
 系统先把AsyncTask的Params的参数封装成为FutureTask对象，FutureTask是一个并发类，在这里它充当了Runnable的作用。
+
 接着这个FutureTask会交给SerialExecutor的execute方法去处理
+
 execute方法首先会把FutureTask对象插入到任务队列mTasks中，如果这个时候没有正在活动的AsyncTask任务，那么就会调用SerialExecutor的scheduleNext方法来执行下一个AsyncTask任务。
+
 同时当一个AsyncTask任务执行完后，AsyncTask会继续执行其他任务直到所有的任务都被执行为止。
+
 在默认情况下，AsyncTask是串行执行的。
