@@ -156,3 +156,7 @@ public static int getBitmapWidth(Bitmap bitmap) {
     return bitmap.getWidth();
 }
 ```
+
+## 相关链接
+
+[探究Android中的注解](http://droidyue.com/blog/2016/08/14/android-annnotation/)
