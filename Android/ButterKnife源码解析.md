@@ -35,3 +35,10 @@ ButterKnife的使用相信大家也都不会陌生的，不过在讲解源码之
 [Java注解](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/%E6%B3%A8%E8%A7%A3.md)
 
 ## Annotation
+
+
+## 相关链接
+
+[ButterKnife源码分析](http://www.jianshu.com/p/1c449c1b0fa2#)
+
+[Android注解使用之通过annotationProcessor注解生成代码实现自己的ButterKnife框架](http://www.cnblogs.com/whoislcj/p/6168641.html#commentform)
