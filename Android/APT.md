@@ -104,7 +104,7 @@ dependencies {
 * javapoet 是方块公司出的又一个好用到爆炸的裤子，提供了各种 API 让你用各种姿势去生成 Java 代码文件，避免了徒手拼接字符串的尴尬。
 * auto-service 是 Google 家的裤子，主要用于注解 Processor，对其生成 META-INF 配置信息。
 
-关于javapoet的使用可以参考其他文章
+关于javapoet的使用可以参考这个[JavaPoet](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/JavaPoet.md)
 这里在介绍`AbstractProcessor`中的几个方法，帮助理解
 #### 常用Element子类
 1. TypeElement：类
