@@ -260,7 +260,9 @@ public class MainActivity extends AppCompatActivity {
 可能有人会一下懵逼了，因为`DIMainActivity`我们根本就没有创建过啊，怎么会有那么个方法呢。
 其实是一开始我只写了`@DIActivity`，然后编译一下，才生成了DIMainActivity，`DIMainActivity`在app/build/generated/source/apt里面
 DIMainActivity是怎么生成的呢？ 它就是通过DIProcessor来生成的。
+
 这就有点像Dagger2了，因为它的就是类似这样的，需要编译一下，生成对应的方法。
+
 当然，我们还可以做进一步的处理，就像ButterKnife一样，预先就把API方法给自己写了，相关的处理也是我们自己来做。在app层就只管调用就好啦
 
 
