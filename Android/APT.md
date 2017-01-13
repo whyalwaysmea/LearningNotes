@@ -272,3 +272,5 @@ DIMainActivity是怎么生成的呢？ 它就是通过DIProcessor来生成的。
 [Annotation-Processing-Tool详解](http://qiushao.net/2015/07/07/Annotation-Processing-Tool%E8%AF%A6%E8%A7%A3/)
 
 [Android 利用 APT 技术在编译期生成代码](http://brucezz.itscoder.com/use-apt-in-android#)
+
+[Android注解使用之通过annotationProcessor注解生成代码实现自己的ButterKnife框架](http://www.cnblogs.com/whoislcj/p/6168641.html)
