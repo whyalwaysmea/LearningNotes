@@ -90,7 +90,7 @@
 
 -----
 ## 图片
-### Bitmap
+### [Bitmap and LruCache](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Bitmap.md)
 ### ImageLoader实现原理，三级缓存
 ### .9.png
 ### Glide Picasso Fresco

@@ -260,4 +260,17 @@ try {
 }
 ```
 
-更多DiskLruCache的使用方法可以查看 [Android DiskLruCache完全解析，硬盘缓存的最佳方案](http://blog.csdn.net/guolin_blog/article/details/28863651)
+更多DiskLruCache的使用方法可以查看   
+[Android DiskLruCache完全解析，硬盘缓存的最佳方案](http://blog.csdn.net/guolin_blog/article/details/28863651)
+
+
+
+### DiskLruCache源码解析
+在使用了DiskLruCache来缓存文件之后，可以通过文件管理器看到所缓存的文件   
+![缓存文件](http://img.blog.csdn.net/20140803140924754?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZ3VvbGluX2Jsb2c=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+上面那些文件名很长的文件就是一张张缓存的图片，每个文件都对应着一张图片，而journal文件是DiskLruCache的一个日志文件，程序对每张图片的操作记录都存放在这个文件中，基本上看到journal这个文件就标志着该程序使用DiskLruCache技术了。
+
+#### 相关链接
+
+[Android DiskLruCache 源码解析 硬盘缓存的绝佳方案](http://blog.csdn.net/lmj623565791/article/details/47251585)
