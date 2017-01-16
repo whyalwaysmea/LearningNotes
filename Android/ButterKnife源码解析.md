@@ -42,3 +42,5 @@ ButterKnife的使用相信大家也都不会陌生的，不过在讲解源码之
 [ButterKnife源码分析](http://www.jianshu.com/p/1c449c1b0fa2#)
 
 [Android注解使用之通过annotationProcessor注解生成代码实现自己的ButterKnife框架](http://www.cnblogs.com/whoislcj/p/6168641.html#commentform)
+
+[深入理解 ButterKnife，让你的程序学会写代码](http://dev.qq.com/topic/578753c0c9da73584b025875#rd)
