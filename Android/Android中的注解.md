@@ -12,6 +12,7 @@ dependencies {
 
 * 定义几个常量用于限定
 * 从上面的常量选取值进行使用
+
 ```java
 public static final int COLOR_RED = 0;
 public static final int COLOR_GREEN = 1;
