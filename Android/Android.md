@@ -172,7 +172,7 @@
 * [APT使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/APT.md)
 
 ### Orm
-### EventBus
+### [EventBus](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/EventBus.md)
 ### RxJava
 * <a href="https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/RxJava%E3%81%AEobserveOn()%E4%B8%8EsubscribeOn().md">线程调度</a>
 
