@@ -131,7 +131,6 @@
 
 ---
 ## 项目构建
-### Gradle
 ### JCenter
 ### [65535方法数限制のMultiDex](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Multidex.md)
 ### 编译，混淆，签名，打包，多渠道打包
