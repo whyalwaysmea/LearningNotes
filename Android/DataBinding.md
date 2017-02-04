@@ -212,3 +212,40 @@ protected void onCreate(Bundle savedInstanceState) {
     mainBinding.viewStub.getViewStub().inflate();
 }
 ```
+
+## Observable
+BaseObservable   
+让Java实体类继承BaseObservable，然后在对应的setXXX()中调用相关方法:
+```java
+public class User extends BaseObservable{
+    private String firstName;
+    private String lastName;
+
+    public User(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+        notifyChange();
+    }
+
+    @Bindable
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+        notifyPropertyChanged(BR.lastName);
+    }
+}
+```
+
+Observable Fields
+Observable Collection
