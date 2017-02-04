@@ -110,3 +110,105 @@ public class Event {
     }
 }
 ```
+
+### include使用
+```xml
+<!-- include_demo.xml-->
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="user"
+            type="com.whyalwaysmea.databinding.User" />
+        <variable
+            name="event"
+            type="com.whyalwaysmea.databinding.MainActivity.Event" />
+    </data>
+
+    <LinearLayout
+        android:background="@color/colorPrimary"
+        android:id="@+id/activity_main"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="@{user.firstName}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="@{user.lastName}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</layout>
+
+<!-- activity_main.xml-->
+<include
+    layout="@layout/include_demo" bind:user="@{user}"/>
+```
+
+### ViewStub
+```xml
+<!-- ViewStub-->
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content">
+
+    <ImageView
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
+
+
+<!-- activity_main.xml-->
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="user"
+            type="com.whyalwaysmea.databinding.User" />
+        <variable
+            name="event"
+            type="com.whyalwaysmea.databinding.MainActivity.Event" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/activity_main"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ViewStub
+            android:id="@+id/view_stub"
+            android:layout="@layout/view_stub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+            ...
+
+        <include
+            layout="@layout/include_demo" bind:user="@{user}"/>
+    </LinearLayout>
+</layout>
+```
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ActivityMainBinding mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+    mainBinding.viewStub.getViewStub().inflate();
+}
+```
