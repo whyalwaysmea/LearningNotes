@@ -151,7 +151,7 @@
 ---
 
 ## 构架与设计
-### MVC,MVP,MVVP
+### MVC,MVP,MVVM
 ### Flux
 ### 设计模式
 

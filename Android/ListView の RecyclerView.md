@@ -20,5 +20,7 @@
 
 
 ## ListView の RecyclerView 对比
+### 缓存机制对比
+
 * [Android ListView与RecyclerView对比浅析--缓存机制](http://dev.qq.com/topic/5811d3e3ab10c62013697408)
 * [RecyclerView 和 ListView 使用对比分析](http://www.jianshu.com/p/f592f3715ae2)
