@@ -136,9 +136,8 @@
 ## 项目构建
 ### JCenter
 ### [65535方法数限制のMultiDex](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Multidex.md)
-### 编译，混淆，签名，打包，多渠道打包
-[Android打包提速实践](http://www.jianshu.com/p/e456a5ac8613)
-[该作者的更多实践](https://github.com/tianzhijiexian/Android-Best-Practices)
+### [多渠道打包](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%A4%9A%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85.md)
+### 混淆
 ### AndroidManifest
 ### 权限管理
 ### adb
@@ -166,9 +165,7 @@
 ## 第三方库
 ### 推送
 ### IM
-### 图片
 ### 网络
-### Gson
 ### ButterKnife
 * [ButterKnife源码解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/ButterKnife%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)
 * [APT使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/APT.md)
