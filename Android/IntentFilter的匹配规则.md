@@ -29,13 +29,16 @@ intent-filter中，action和category是必须存在的。 data按需求而定。
 
 
 ## action的匹配规则
-action的匹配要求Intent中的action存在且必须和过滤规则中的其中一个action相同。
+action的匹配要求Intent中的action存在且必须和过滤规则中的其中一个action相同。   
 一个Intent只能设置一个action
 
 ## category的匹配规则
-category的匹配要求Intent中如果含有category，那么所有的category都必须和过滤规则中的其中一个category相同。
-换句话说，Intent中如果出现了category，不管有几个category，对于每个category来说，它必须是过滤规则中已经定义了的category。
-当然，如果在intent-filter中设置了`<category android:name="android.intent.category.DEFAULT" />`，那么不设置category也可以匹配的。
+category的匹配要求Intent中如果含有category，那么所有的category都必须和过滤规则中的其中一个category相同。   
+
+换句话说，Intent中如果出现了category，不管有几个category，对于每个category来说，它必须是过滤规则中已经定义了的category。  
+
+当然，如果在intent-filter中设置了`<category android:name="android.intent.category.DEFAULT" />`，那么不设置category也可以匹配的。因为在调用 startActivity() 方法的时候会自动将这 category 添加到 Intent 中(查看所有系统源码，也都带上了这个 category)
+
 `<category android:name="android.intent.category.DEFAULT" />`这个是必须存在的，因为不含有DEFAULT这个category的Activity是无法接收隐式的Intent的。
 
 ## data的匹配规则
