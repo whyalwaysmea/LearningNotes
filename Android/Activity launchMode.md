@@ -22,7 +22,8 @@ android.util.AndroidRuntimeException: Calling startActivity() from outside of an
   如果新Activity已经位于任务栈的栈顶，那么Activity不会被重新创建，所以它的启动三回调(onCreate, onStart, onResume)就不会执行，同时Activity的onNewIntent()方法会被回调。如果Activity已经存在，但是不再栈顶，那么作用和standard模式一样。
 
 * singleTask栈内单例：
-activity只会在任务栈里面存在一个实例。如果要激活的activity，在任务栈里面已经存在，就不会创建新的activity，而是复用这个已经存在的activity，调用 onNewIntent() 方法，并且清空这个activity任务栈上面所有的activity。应用场景：大多数App的主页。对于大部分应用，当我们在主界面点击回退按钮的时候都是退出应用，那么当我们第一次进入主界面之后，主界面位于栈底，以后不管我们打开了多少个Activity，只要我们再次回到主界面，都应该使用将主界面Activity上所有的Activity移除的方式来让主界面Activity处于栈顶，而不是往栈顶新加一个主界面Activity的实例，通过这种方式能够保证退出应用时所有的Activity都能报销毁。
+activity只会在任务栈里面存在一个实例。如果要激活的activity，在任务栈里面已经存在，就不会创建新的activity，而是复用这个已经存在的activity，调用 onNewIntent() 方法，并且清空这个activity任务栈上面所有的activity。应用场景：大多数App的主页。对于大部分应用，当我们在主界面点击回退按钮的时候都是退出应用，那么当我们第一次进入主界面之后，主界面位于栈底，以后不管我们打开了多少个Activity，只要我们再次回到主界面，都应该使用将主界面Activity上所有的Activity移除的方式来让主界面Activity处于栈顶，而不是往栈顶新加一个主界面Activity的实例，通过这种方式能够保证退出应用时所有的Activity都能报销毁。  
+在启动 singleTask 的 Activity时，系统会先检查是否有 Task 的 affinity 值与该 Activity 的 taskAffinity 相同，如果有，Activity 就会在这个 Task 中启动，否则就会在新的 Task 中启动。因此，如果我们想要设置了 singleTask 启动模式的 Activity 在新的 Task 中启动，就要为它设置一个独立的 taskAffinity 属性值。如果不是在新的 Task 中启动，它会在已有的 Task 中查看是否已经存在相应的 Activity 实例，如果存在，就会把位于这个 Activity 实例上面的 Activity 全部结束掉，即最终这个 Activity 实例会位于该 Task 的栈顶，并调用该实例的 onNewIntent() 方法。
 
 * singleInstance 单实例模式：
 这是一种加强的singleTask。此种模式的Activity只能单独地位于一个任务栈中，换句话说，比如Activity A是singleInstance模式，当A启动后，系统会为它创建一个新的任务栈，然后A独自在这个新的任务栈中，由于栈的复用性，后续的请求均不会创建新的Activity A。
@@ -71,6 +72,37 @@ startActivity(intent);
 
 但是，如果LaunchMode1Activity的allowTaskReparenting属性设为true时，LaunchMode1Activity就可以改变从属任务栈，也就是当应用B启动他时，他会从B的任务栈自动移到他自己的任务栈，也就是应用A的包名的名称的任务栈。
 当从桌面启动应用A时，发现A的任务栈已经存在，就认为上次A没有退出去，最后一个页面是栈中的LaunchMode1Activity，所以直接显示LaunchMode1Activity。
+
+
+### 案例singleTask测试
+singleTask 不设置 taskAffinity：
+![singleTask 不设置 taskAffinity](https://imgs.babits.top/2017010852activity_single_task_without_task_affinity.png)   
+只有一个任务栈  
+
+singleTask 设置 taskAffinity 为包名：
+![singleTask 设置 taskAffinity 为包名](https://imgs.babits.top/2017010884648activity_single_task_with_same_task_affinity.png)   
+只有一个任务栈
+
+singleTask 设置 taskAffinity 为包名以外的值：
+![singleTask 设置 taskAffinity 为包名以外的值](https://imgs.babits.top/2017010879551activity_single_task_with_different_task_affinity.png)   
+有两个任务栈
+
+### 案例singleInstance测试
+singleInstance 不设置 taskAffinity：
+![singleInstance 不设置 taskAffinity](https://imgs.babits.top/2017011786410activity_single_instance_without_task_affinity.png)   
+有两个任务栈
+
+singleInstance 设置 taskAffinity 为包名：
+![singleInstance 设置 taskAffinity 为包名](https://imgs.babits.top/2017011752729activity_single_instance_with_same_task_affinity.png)  
+有两个任务栈
+
+singleInstance 设置 taskAffinity 为包名以外的值：
+![singleInstance 设置 taskAffinity 为包名以外的值](https://imgs.babits.top/2017011751645activity_single_instance_with_different_task_affinity.png)
+有两个任务栈
+
+singleInstance（设置 taskAffinity 为包名以外的值）启动 standard（不设置 taskAffinity）：
+![singleInstance（设置 taskAffinity 为包名以外的值）启动 standard（不设置 taskAffinity）](https://imgs.babits.top/2017011751555single_instance_difftaskaff_launch_standard_notaskaff.png)
+有两个任务栈,新启动的standard在最开始的那个任务栈中
 
 
 ## 设置LaunchMode
