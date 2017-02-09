@@ -64,5 +64,6 @@ data的匹配规则和action类似，如果过滤规则中定义了data，那么
 只有<data>标签中指定的内容和 Intent 中携带的 Data 完全一致时，当前活动才能够响应该 Intent。不过一般在<data>标签中都不会指定过多的内容，常见的是 mimeType 和 scheme。
 
 ## 判断
-当我们通过隐式方式启动一个Activity的时候，可以做一下判断，看是否有Activity能够匹配我们的隐式Intent，如果不做判断就有可能crash。
+当我们通过隐式方式启动一个Activity的时候，可以做一下判断，看是否有Activity能够匹配我们的隐式Intent，如果不做判断就有可能crash。   
+
 判断方法有两种，采用`PackageManager`的`resolveActivity`方法或者`Intent`的`resolveActivity`方法，如果它们找不到匹配的Activity就会返回null。
