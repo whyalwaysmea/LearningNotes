@@ -78,27 +78,49 @@ startActivity(intent);
 singleTask 不设置 taskAffinity：
 ![singleTask 不设置 taskAffinity](https://imgs.babits.top/2017010852activity_single_task_without_task_affinity.png)   
 只有一个任务栈  
+-----
 
 singleTask 设置 taskAffinity 为包名：
 ![singleTask 设置 taskAffinity 为包名](https://imgs.babits.top/2017010884648activity_single_task_with_same_task_affinity.png)   
 只有一个任务栈
+-----
+
 
 singleTask 设置 taskAffinity 为包名以外的值：
 ![singleTask 设置 taskAffinity 为包名以外的值](https://imgs.babits.top/2017010879551activity_single_task_with_different_task_affinity.png)   
 有两个任务栈
+-----
+
+
+Activity A为standart模式， ActivityB 和 ActivityC为singleTask模式，taskAffinity相同，为包名以外的值(假设为:com.haha)。  
+启动顺序 A->B->C->A->B   
+这个时候返回，就显示A，再返回就到桌面了。
+
+解析：
+一开始A在包名的栈下面，启动B，这个时候创建com.haha栈和B实例，启动C，创建C实例进入com.haha栈中。    
+C启动A，创建一个A的实例，进入com.haha栈中。     
+A启动B，B回到栈顶，CA出栈。  
+在B的时候按返回，B出栈， 后台的包名栈到前台，显示A。
+
 
 ### 案例singleInstance测试
 singleInstance 不设置 taskAffinity：
 ![singleInstance 不设置 taskAffinity](https://imgs.babits.top/2017011786410activity_single_instance_without_task_affinity.png)   
 有两个任务栈
+-----
+
 
 singleInstance 设置 taskAffinity 为包名：
 ![singleInstance 设置 taskAffinity 为包名](https://imgs.babits.top/2017011752729activity_single_instance_with_same_task_affinity.png)  
 有两个任务栈
+-----
+
 
 singleInstance 设置 taskAffinity 为包名以外的值：
 ![singleInstance 设置 taskAffinity 为包名以外的值](https://imgs.babits.top/2017011751645activity_single_instance_with_different_task_affinity.png)
 有两个任务栈
+-----
+
 
 singleInstance（设置 taskAffinity 为包名以外的值）启动 standard（不设置 taskAffinity）：
 ![singleInstance（设置 taskAffinity 为包名以外的值）启动 standard（不设置 taskAffinity）](https://imgs.babits.top/2017011751555single_instance_difftaskaff_launch_standard_notaskaff.png)
@@ -124,3 +146,5 @@ singleInstance（设置 taskAffinity 为包名以外的值）启动 standard（�
 
 ## 相关链接
 [我打赌你一定没搞明白的Activity启动模式](http://www.jianshu.com/p/2a9fcf3c11e4#)
+
+[安卓基础：task, launchMode, Intent flag](https://blog.piasy.com/2017/01/16/Android-Basics-Task-and-LaunchMode/)
