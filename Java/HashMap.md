@@ -236,6 +236,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 这里涉及到了一些JDK1.8之后的优化，所以暂时就不具体分析了。
 
+#### hash算法
 我们看看这里的这个hash()算法
 ```java
 static final int hash(Object key) {
@@ -243,8 +244,64 @@ static final int hash(Object key) {
     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
 }
 ```
-通过将传入键的 hashCode 进行无符号右移 16 位，然后进行按位异或，得到这个键的哈希值。
+通过将传入键的 hashCode 进行无符号右移 16 位，然后进行按位异或，得到这个键的哈希值。  
+这样可以避免只靠低位数据来计算哈希时导致的冲突，计算结果由高低位结合决定，可以避免哈希值分布不均匀。   
+而且，采用位运算效率更高。
 
+
+#### 扩容
+扩容开销很大，需要迭代所有的元素，rehash、赋值，还得保留原来的数据结构。
+
+
+## get
+```java
+public V get(Object key) {
+    Node<K,V> e;
+    //还是先计算 哈希值
+    return (e = getNode(hash(key), key)) == null ? null : e.value;
+}
+
+final Node<K,V> getNode(int hash, Object key) {
+    Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
+    //tab 指向哈希表，n 为哈希表的长度，first 为 (n - 1) & hash 位置处的数组中的头一个节点
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+        (first = tab[(n - 1) & hash]) != null) {
+        //如果数组里第一个元素就相等，直接返回
+        if (first.hash == hash &&
+            ((k = first.key) == key || (key != null && key.equals(k))))
+            return first;
+        //否则就得慢慢遍历找
+        if ((e = first.next) != null) {
+            if (first instanceof TreeNode)
+                //如果是树形节点，就调用树形节点的 get 方法
+                return ((TreeNode<K,V>)first).getTreeNode(hash, key);
+            do {
+                //do-while 遍历链表的所有节点
+                if (e.hash == hash &&
+                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    return e;
+            } while ((e = e.next) != null);
+        }
+    }
+    return null;
+}
+```
+先计算哈希值;
+然后再用 (n - 1) & hash 计算出数组的位置;
+在桶里的链表进行遍历查找
+
+## 总结
+结合平时使用，可以了解到 HashMap 大概具有以下特点：
+
+* 底层实现是 链表数组，JDK 8 后又加了 红黑树
+* 实现了 Map 全部的方法
+* key 用 Set 存放，所以想做到 key 不允许重复，key 对应的类需要重写 hashCode 和 equals 方法
+*  允许空键和空值（但空键只有一个，且放在第一位，下面会介绍）
+*  元素是无序的，而且顺序会不定时改变
+*  插入、获取的时间复杂度基本是 O(1)（前提是有适当的哈希函数，让元素分布在均匀的位置）
+*  遍历整个 Map 需要的时间与 桶(数组) 的长度成正比（因此初始化时 HashMap 的容量不宜太大）
+*  两个关键因子：初始容量、加载因子
+除了不允许 null 并且同步，Hashtable 几乎和他一样。HashTable很多方法上都加上了synchronized
 
 ## 相关链接
 [Java 集合深入理解（16）：HashMap 主要特点和关键方法源码解读](http://blog.csdn.net/u011240877/article/details/53351188)   
