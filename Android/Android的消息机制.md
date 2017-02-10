@@ -1,5 +1,14 @@
 ## Android消息机制概括
 Android的消息机制主要是指Handler的运行机制，Handler的运行需要底层的MessageQueue和Looper的支撑。
+
+**Message** 是在线程之间传递的消息，它可以在内部携带少量的信息，用于在不同线程之间交换数据。
+
+**Handler** 顾名思义也就是处理者的意思，它主要用于发送和处理消息的。发送消息一般会使用Handler的sendMessage()方法，而发出的消息经过一些列地辗转处理后，最终会传递到Handler的handleMessage()方法中。
+
+**MessageQueue** 是消息队列的意思，它主要用于存放所有通过Handler发送的消息。这部分消息会一直存在于消息队列中，等待被处理。每个线程中只会有一个MessageQueue对象。（MessageQueue是在Looper的构造函数中创建的，因此一个MessageQueue对应一个Looper）
+
+**Looper** 是每个线程中MessageQueue的管家，调用Looper的loop()方法后，就会进入到一个无限循环当中，然后每当发现MessageQueue中存在一条消息，就会将它取出，并传递到Handler的handleMessage()方法中。每个线程中也会只有一个Looper对象。
+
 MessageQueue是以**单链表**的数据结构存储消息列表，但是以队列的形式对外提供插入和删除消息操作的消息队列。
 MessageQueue只是消息的存储单元，它不能去处理消息。而Looper则是以无限循环的形式去查找是否有新消息，如果有的话就去处理消息，否则就一直等待着。
 
@@ -130,4 +139,15 @@ public void dispatchMessage(Message msg) {
 
 ## 主线程的消息循环
 Android的主线程就是ActivityThread，主线程的入口方法就是main，其中调用了Looper.prepareMainLooper()来创建主线程的Looper以及MessageQueue，并通过Looper.loop()方法来开启主线程的消息循环。
+
 主线程内有一个Handler，即ActivityThread.H，它定义了一组消息类型，主要包含了四大组件的启动和停止等过程，例如LAUNCH_ACTIVITY等。 ActivityThread通过ApplicationThread和AMS进行进程间通信，AMS以进程间通信的方法完成ActivityThread的请求后会回调ApplicationThread中的Binder方法，然后ApplicationThread会向H发送消息，H收到消息后会将ApplicationThread中的逻辑切换到ActivityThread中去执行，即切换到主线程中去执行，这个过程就是主线程的消息循环模型。
+
+### Looper.loop 为什么不会阻塞住主线程？
+主线程被阻塞的定义是什么？其实就是主线程的 MessageQueue 中，某个消息的处理时间过长，导致后面的消息不能及时处理。
+
+那 Looper.loop 会不会阻塞主线程？看在哪里调用，如果在 Activity.onCreate 中或者其他任何在主线程中执行的代码中调用，当然会，因为主线程进入死循环了。但如果在 ActivityThread 的 main 函数中（这也是这个问题被提出的场景），当然不会。
+
+正是这个无限循环不断地从 MessageQueue 中取出消息，并进行处理，安卓系统的事件循环模型才得以运行。它会导致某个消息的处理时间过长，后面的消息不能及时处理吗？当然不会，没有它都谈不上消息处理！
+
+## Handler所导致的内存泄漏问题
+如果使用了非静态的内部 Handler 子类、匿名 Handler 子类，或者把非静态的内部 Runnable 子类、匿名 Runnable 子类 post 到任意 Handler 上，就很可能发生内存泄漏，而如果这些类都在 Activity 内部，那就泄露了 Activity。
