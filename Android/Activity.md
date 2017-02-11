@@ -53,3 +53,10 @@ onRestoreInstanceState的调用时机在onStart之后。
 >IMPORTANCE_SERVICE:服务进程，拨号、邮件存储之类的。
 >IMPORTANCE_BACKGROUND:后台进程，启动后被切换到后台的进程。
 >IMPORTANCE_EMPTY:没有任何东西在内运行的进程，有些程序，比如BTE，在程序退出后，依然会在进程中驻留一个空进程，这个进程里没有任何数据在运行，作用往往是　　提高该程序下次的启动速度或者记录程序的一些历史信息。
+
+
+## Q&A
+Android的Activity什么时候会调用onCreate()而不调用onStart()？
+>直接oncreate里就ondestroy就行
+
+onStart(),与onResume()有什么区别
