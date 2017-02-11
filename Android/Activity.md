@@ -45,13 +45,18 @@ onRestoreInstanceState的调用时机在onStart之后。
 ### 应用被系统回收后的处理
 应用处于后台运行时，当android系统内存不足时会销毁后台的应用。
 >一个应用，先后打开3个Activity，A->B->C，当该应用处于后台运行并被系统回收后，发生了什么？同时Android的进程回收机制是什么样的？
+
 #### Android内存回收机制
 当系统内存不足时，系统将激活内存回收过程。
 回收优先级：
 >IMPORTANCE_FOREGROUND:前台进程，目前正在屏幕上显示的进程和一些系统进程。
+
 >IMPORTANCE_VISIBLE:可见进程，可见进程是一些不再前台，但用户依然可见的进程，比如输入法、天气、时钟等。
+
 >IMPORTANCE_SERVICE:服务进程，拨号、邮件存储之类的。
+
 >IMPORTANCE_BACKGROUND:后台进程，启动后被切换到后台的进程。
+
 >IMPORTANCE_EMPTY:没有任何东西在内运行的进程，有些程序，比如BTE，在程序退出后，依然会在进程中驻留一个空进程，这个进程里没有任何数据在运行，作用往往是　　提高该程序下次的启动速度或者记录程序的一些历史信息。
 
 
@@ -59,4 +64,13 @@ onRestoreInstanceState的调用时机在onStart之后。
 Android的Activity什么时候会调用onCreate()而不调用onStart()？
 >直接oncreate里就ondestroy就行
 
-onStart(),与onResume()有什么区别
+
+onStart(),与onResume()有什么区别?
+>onStart()：在活动由不可见变为可见的时候调用;  onResume()在活动准备好和用户进行交互的时候调用，此时的活动一定位于返回栈的栈顶。
+
+
+onStart和onResume,onPause和onStop区别？
+>onStart和onStop是从Activity是否可见这个角度来回调的，而onResume和onPause是从Activity是否位于前台这个角度来回调
+
+假设当前Activity A启动Activity B，那么两者的生命周期是什么样?
+>A: onPause ->  B onCreate onStart onResume ->A onStop
