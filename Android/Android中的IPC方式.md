@@ -209,3 +209,7 @@ ContentProvider是Android中提供的专门用于不同应用间进行数据共�
 
 ## 选择合适的IPC方式
 ![选择合适的IPC方式](https://hujiaweibujidao.github.io/images/androidart_ipc.png)
+
+
+## Q&A
+[为什么 Android 要采用 Binder 作为 IPC 机制？](http://mp.weixin.qq.com/s?__biz=MzI0MjE3OTYwMg==&mid=2649548116&idx=1&sn=d11a131871623110c74e3676d4fcf785&chksm=f1180e29c66f873f9cac5dc104f97fae319c1831219a9fd9458a4429f16562f6712cc7f65a4c&scene=21#wechat_redirect)

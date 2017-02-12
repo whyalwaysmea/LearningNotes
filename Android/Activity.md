@@ -74,3 +74,13 @@ onStart和onResume,onPause和onStop区别？
 
 假设当前Activity A启动Activity B，那么两者的生命周期是什么样?
 >A: onPause ->  B onCreate onStart onResume ->A onStop
+
+
+理解Activity，View,Window三者关系?
+>Activity像一个工匠（控制单元），Window像窗户（承载模型），View像窗花（显示视图）LayoutInflater像剪刀，Xml配置像窗花图纸。
+1：Activity构造的时候会初始化一个Window，准确的说是PhoneWindow。
+2：这个PhoneWindow有一个“ViewRoot”，这个“ViewRoot”是一个View或者说ViewGroup，是最初始的根视图。
+3：“ViewRoot”通过addView方法来一个个的添加View。比如TextView，Button等
+4：这些View的事件监听，是由WindowManagerService来接受消息，并且回调Activity函数。比如onClickListener，onKeyDown等。
+Activity在onCreate之前调用attach方法，在attach方法中会创建window对象。window对象创建时并没有创建 DocerView 对象。用户在Activity中调用setContentView,然后调用window的
+setContentView，这时会检查DecorView是否存在，如果不存在则创建DecorView对象，然后把用户自己的 View  添加到 DecorView 中。
