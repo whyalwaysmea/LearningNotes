@@ -10,8 +10,19 @@ ContextWrapper下面还有三个子类，分别是：ContextThemeWrapper，Appli
 ContextThemeWrapper类，如其名所言，其内部包含了与主题（Theme）相关的接口，这里所说的主题就是指在AndroidManifest.xml中通过android：theme为Application元素或者Activity元素指定的主题。当然，只有Activity才需要主题，Service是不需要主题的，因为Service是没有界面的后台场景，所以Service直接继承于ContextWrapper，Application同理。
 
 ## Context的作用域
+![Context的作用域](http://upload-images.jianshu.io/upload_images/1187237-fb32b0f992da4781.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+这里有两种特殊情况需要解释一下：
+* 如果我们用ApplicationContext去启动一个LaunchMode为standard的Activity的时候会报错
+>android.util.AndroidRuntimeException: Calling startActivity from outside of an Activity context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
 
+* 在Application和Service中去layout inflate也是合法的，但是会使用系统默认的主题样式，如果你自定义了某些样式可能不会被使用。所以这种方式也不推荐使用。
+
+一句话总结：凡是跟UI相关的，都应该使用Activity做为Context来处理；其他的一些操作，Service,Activity,Application等实例都可以，当然了，注意Context引用的持有，防止内存泄漏。
+
+## getApplication()和getApplicationContext()区别
+
+## Context引起的内存泄漏
 
 ## 相关链接
 
