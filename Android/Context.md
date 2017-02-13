@@ -21,6 +21,41 @@ ContextThemeWrapper类，如其名所言，其内部包含了与主题（Theme�
 一句话总结：凡是跟UI相关的，都应该使用Activity做为Context来处理；其他的一些操作，Service,Activity,Application等实例都可以，当然了，注意Context引用的持有，防止内存泄漏。
 
 ## getApplication()和getApplicationContext()区别
+通过打印地址可以发现，它们是同一个对象。  
+getApplication()方法的语义性非常强，一看就知道是用来获取Application实例的，但是这个方法只有在Activity和Service中才能调用的到。那么也许在绝大多数情况下我们都是在Activity或者Service中使用Application的，但是如果在一些其它的场景，比如BroadcastReceiver中也想获得Application的实例，这时就可以借助getApplicationContext()方法了。  
+也就是说，getApplicationContext()方法的作用域会更广一些，任何一个Context的实例，只要调用getApplicationContext()方法都可以拿到我们的Application对象。
+
+## getBaseContext()
+```java
+public class ContextWrapper extends Context {  
+    Context mBase;  
+
+    /**
+     * Set the base context for this ContextWrapper.  All calls will then be
+     * delegated to the base context.  Throws
+     * IllegalStateException if a base context has already been set.
+     *  
+     * @param base The new base context for this wrapper.
+     */  
+    protected void attachBaseContext(Context base) {  
+        if (mBase != null) {  
+            throw new IllegalStateException("Base context already set");  
+        }  
+        mBase = base;  
+    }  
+
+    /**
+     * @return the base context as set by the constructor or setBaseContext
+     */  
+    public Context getBaseContext() {  
+        return mBase;  
+    }
+
+    ...
+}
+```
+attachBaseContext()方法其实是由系统来调用的，它会把ContextImpl对象作为参数传递到attachBaseContext()方法当中，从而赋值给mBase对象，之后ContextWrapper中的所有方法其实都是通过这种委托的机制交由ContextImpl去具体实现的，所以说ContextImpl是上下文功能的实现类是非常准确的。
+
 
 ## Context引起的内存泄漏
 
@@ -31,8 +66,6 @@ ContextThemeWrapper类，如其名所言，其内部包含了与主题（Theme�
 [Difference between getContext() , getApplicationContext() , getBaseContext() and “this”](http://stackoverflow.com/questions/10641144/difference-between-getcontext-getapplicationcontext-getbasecontext-and)
 
 [Android中Context详解 ---- 你所不知道的Context](http://blog.csdn.net/qinjuning/article/details/7310620)
-
-[android学习—— context 和 getApplicationContext()](http://blog.csdn.net/janronehoo/article/details/7348566)
 
 [Context都没弄明白，还怎么做Android开发？](http://www.jianshu.com/p/94e0f9ab3f1d)
 
