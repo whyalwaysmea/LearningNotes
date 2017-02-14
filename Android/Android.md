@@ -17,8 +17,7 @@
 * [发送自定义广播和LocalBroadcast](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/SendBroadcast%20.md)
 
 
-### ContentProvider
-* ContentObserver
+### [ContentProvider](http://blog.csdn.net/coder_pig/article/details/47858489)
 
 ### Fragment
 
