@@ -58,6 +58,44 @@ attachBaseContext()方法其实是由系统来调用的，它会把ContextImpl�
 
 
 ## Context引起的内存泄漏
+### 错误的单例模式
+```java
+public class Singleton {
+    private static Singleton instance;
+    private Context mContext;
+
+    private Singleton(Context context) {
+        this.mContext = context;
+    }
+
+    public static Singleton getInstance(Context context) {
+        if (instance == null) {
+            instance = new Singleton(context);
+        }
+        return instance;
+    }
+}
+```
+假如Activity A去getInstance获得instance对象，传入this，常驻内存的Singleton保存了你传入的Activity A对象，并一直持有，即使Activity被销毁掉，但因为它的引用还存在于一个Singleton中，就不可能被GC掉，这样就导致了内存泄漏。
+
+### View持有Activity引用
+```java
+public class MainActivity extends Activity {
+    private static Drawable mDrawable;
+
+    @Override
+    protected void onCreate(Bundle saveInstanceState) {
+        super.onCreate(saveInstanceState);
+        setContentView(R.layout.activity_main);
+        ImageView iv = new ImageView(this);
+        mDrawable = getResources().getDrawable(R.drawable.ic_launcher);
+        iv.setImageDrawable(mDrawable);
+    }
+}
+```
+有一个静态的Drawable对象当ImageView设置这个Drawable时，ImageView保存了mDrawable的引用，而ImageView传入的this是MainActivity的mContext，因为被static修饰的mDrawable是常驻内存的，MainActivity是它的间接引用，MainActivity被销毁时，也不能被GC掉，所以造成内存泄漏。
+
+
 
 ## 相关链接
 
