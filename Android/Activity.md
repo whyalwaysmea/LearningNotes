@@ -79,12 +79,158 @@ A: onPause ->  B onCreate onStart onResume ->A onStop
 ### 理解Activity，View,Window三者关系?
 Activity像一个工匠（控制单元），Window像窗户（承载模型），View像窗花（显示视图）LayoutInflater像剪刀，Xml配置像窗花图纸。
 
-1：Activity构造的时候会初始化一个Window，准确的说是PhoneWindow。
-2：这个PhoneWindow有一个“ViewRoot”，这个“ViewRoot”是一个View或者说ViewGroup，是最初始的根视图。
-3：“ViewRoot”通过addView方法来一个个的添加View。比如TextView，Button等
-4：这些View的事件监听，是由WindowManagerService来接受消息，并且回调Activity函数。比如onClickListener，onKeyDown等。
+1：Activity构造的时候会初始化一个Window，准确的说是PhoneWindow。   
+2：这个PhoneWindow有一个“ViewRoot”，这个“ViewRoot”是一个View或者说ViewGroup，是最初始的根视图。   
+3：“ViewRoot”通过addView方法来一个个的添加View。比如TextView，Button等   
+4：这些View的事件监听，是由WindowManagerService来接受消息，并且回调Activity函数。比如onClickListener，onKeyDown等。  
 
 Activity在onCreate之前调用attach方法，在attach方法中会创建window对象。window对象创建时并没有创建 DocerView 对象。用户在Activity中调用setContentView,然后调用window的setContentView，这时会检查DecorView是否存在，如果不存在则创建DecorView对象，然后把用户自己的 View  添加到 DecorView 中。
 
 
-### 关于获取当前Activity的一些思考
+### [关于获取当前Activity的一些思考](https://zhuanlan.zhihu.com/p/25221428?utm_source=qq&utm_medium=social)
+**反射：** 反射是我们经常会想到的方法，思路大概为
+
+1. 获取ActivityThread中所有的ActivityRecord
+2. 从ActivityRecord中获取状态不是pause的Activity并返回
+
+一个使用反射来实现的代码大致如下
+```Java
+public static Activity getActivity() {
+    Class activityThreadClass = null;
+    try {
+        activityThreadClass = Class.forName("android.app.ActivityThread");
+        Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
+        Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
+        activitiesField.setAccessible(true);
+        Map activities = (Map) activitiesField.get(activityThread);
+        for (Object activityRecord : activities.values()) {
+            Class activityRecordClass = activityRecord.getClass();
+            Field pausedField = activityRecordClass.getDeclaredField("paused");
+            pausedField.setAccessible(true);
+            if (!pausedField.getBoolean(activityRecord)) {
+                Field activityField = activityRecordClass.getDeclaredField("activity");
+                activityField.setAccessible(true);
+                Activity activity = (Activity) activityField.get(activityRecord);
+                return activity;
+            }
+        }
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+    } catch (IllegalAccessException e) {
+        e.printStackTrace();
+    } catch (InvocationTargetException e) {
+        e.printStackTrace();
+    } catch (NoSuchFieldException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+```
+然而这种方法并不是很推荐，主要是有以下的不足：
+
+* 反射通常会比较慢
+* 不稳定性，这个才是不推荐的原因，Android框架代码存在修改的可能性，谁要无法100%保证mActivities，paused固定不变。所以可靠性不是完全可靠。
+
+----
+
+**Activity基类:**
+既然反射不是很可靠，那么有一种比较可靠的方式，就是使用Activity基类。   
+在Activity的onResume方法中，将当前的Activity实例保存到一个变量中。    
+```Java
+public class BaseActivity extends Activity{
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyActivityManager.getInstance().setCurrentActivity(this);
+    }
+}
+```
+然而，这一种方法也不仅完美，因为这种方法是基于约定的，所以必须每个Activity都继承BaseActivity，如果一旦出现没有继承BaseActivity的就可能有问题。
+
+---
+**回调方法:**
+通过Framework提供的回调来实现。   
+Android自 API 14开始引入了一个方法，即Application的registerActivityLifecycleCallbacks方法，用来监听所有Activity的生命周期回调，比如onActivityCreated,onActivityResumed等。
+```Java
+作者：技术小黑屋
+链接：https://zhuanlan.zhihu.com/p/25221428
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+public class MyApplication extends Application {
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                MyActivityManager.getInstance().setCurrentActivity(activity);
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+
+            }
+        });
+    }
+}
+```
+这种方法唯一的遗憾就是只支持API 14即其以上。
+```Java
+public class MyActivityManager {
+    private static MyActivityManager sInstance = new MyActivityManager();
+    private WeakReference<Activity> sCurrentActivityWeakRef;
+
+    private MyActivityManager() {
+
+    }
+
+    public static MyActivityManager getInstance() {
+        return sInstance;
+    }
+
+    public Activity getCurrentActivity() {
+        Activity currentActivity = null;
+        if (sCurrentActivityWeakRef != null) {
+            currentActivity = sCurrentActivityWeakRef.get();
+        }
+        return currentActivity;
+    }
+
+    public void setCurrentActivity(Activity activity) {
+        sCurrentActivityWeakRef = new WeakReference<Activity>(activity);
+    }
+}
+```  
+那么为什么要使用弱引用持有Activity实例呢？    
+其实最主要的目的就是避免内存泄露，因为使用默认的强引用会导致Activity实例无法释放，导致内存泄露的出现。
