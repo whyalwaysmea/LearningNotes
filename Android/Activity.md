@@ -86,6 +86,9 @@ Activity像一个工匠（控制单元），Window像窗户（承载模型），
 
 Activity在onCreate之前调用attach方法，在attach方法中会创建window对象。window对象创建时并没有创建 DocerView 对象。用户在Activity中调用setContentView,然后调用window的setContentView，这时会检查DecorView是否存在，如果不存在则创建DecorView对象，然后把用户自己的 View  添加到 DecorView 中。
 
+### 两个Activity之间传递数据，除了intent，广播接收者，contentprovider还有啥？
+1. 利用 static 静态数据，public static 成员变量
+2. 利用外部存储的传输: file, SharedPreferences, 数据库（外部存储需要注意读写冲突）
 
 ### [关于获取当前Activity的一些思考](https://zhuanlan.zhihu.com/p/25221428?utm_source=qq&utm_medium=social)
 **反射：** 反射是我们经常会想到的方法，思路大概为
@@ -135,6 +138,7 @@ public static Activity getActivity() {
 
 ----
 
+
 **Activity基类:**
 既然反射不是很可靠，那么有一种比较可靠的方式，就是使用Activity基类。   
 在Activity的onResume方法中，将当前的Activity实例保存到一个变量中。    
@@ -152,17 +156,8 @@ public class BaseActivity extends Activity{
 
 ---
 **回调方法:**
-通过Framework提供的回调来实现。   
-Android自 API 14开始引入了一个方法，即Application的registerActivityLifecycleCallbacks方法，用来监听所有Activity的生命周期回调，比如onActivityCreated,onActivityResumed等。
 ```Java
-作者：技术小黑屋
-链接：https://zhuanlan.zhihu.com/p/25221428
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
 public class MyApplication extends Application {
-
-
     @Override
     public void onCreate() {
         super.onCreate();

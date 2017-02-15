@@ -47,6 +47,9 @@ Log.d("MyService", "MyService thread id is " + Thread.currentThread().getId());
 * 通过broadcast(广播)的形式
 
 
+### Service里面可以弹吐司么
+可以
+
 ### 如何保证service在后台不被Kill?
 一、onStartCommand方法，返回START_STICKY。当service因内存不足被kill，当内存又有的时候，service又被重新创建，比较不错，但是不能保证任何情况下都被重建，比如进程被干掉了....
 * START_STICKY 在运行onStartCommand后service进程被kill后，那将保留在开始状态，但是不保留那些传入的intent。不久后service就会再次尝试重新创建，因为保留在开始状态，在创建     service后将保证调用onstartCommand。如果没有传递任何开始命令给service，那将获取到null的intent。

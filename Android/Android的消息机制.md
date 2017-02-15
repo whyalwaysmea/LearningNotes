@@ -32,10 +32,12 @@ Android规定UI操作只能在主线程中进行，ViewRootImpl的checkThread方
 ### ThreadLocal的工作原理
 ThreadLocal是一个线程内部的数据存储类，通过它可以在指定的线程中存储数据，数据存储以后，只有在指定线程中可以获取到存储的数据，对于其他线程来说则无法获取到数据。
 对于Handler来说，它需要获取当前线程的Looper，而Looper的作用域就是线程并且不同线程具有不同的Looper，这个时候通过ThreadLocal就可以实现Looper在线程中的存取了。
+
 **ThreadLocal的原理：** 不同线程访问同一个ThreadLocal的get方法时，ThreadLocal内部会从各自的线程中取出一个数组，然后再从数组中根据当前ThreadLocal的索引去查找出对应的value值，不同线程中的数组是不同的，这就是为什么通过ThreadLocal可以在不同线程中维护一套数据的副本并且彼此互不干扰。
 下面分析ThreadLocal的内部实现。ThreadLocal是一个泛型类`public class ThreadLocal<T>`，我们只要弄清楚它的get和set方法就好。
 ```java
 public void set(T value) {
+    // 获得了当前线程实例
     Thread t = Thread.currentThread();
     ThreadLocalMap map = getMap(t);
     if (map != null)
@@ -44,7 +46,7 @@ public void set(T value) {
         createMap(t, value);
 }
 ```
-ThreadLocalMap是Thread类内部专门用来存储线程的ThreadLocal数据的，它内部有一个数组private Entry[] table，ThreadLocal的值就存在这个table数组中。
+ThreadLocalMap是ThreadLocal类内部专门用来存储线程的ThreadLocal数据的，它内部有一个数组private Entry[] table，ThreadLocal的值就存在这个table数组中。
 ```java
 public T get() {
     Thread t = Thread.currentThread();
