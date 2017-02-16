@@ -68,8 +68,7 @@ Android中的进程是托管的，当系统进程空间紧张的时候，会依�
 2. 可视进程(VISIBLE_APP )
 3. 次要服务进程(SECONDARY_SERVER )
 4. 后台进程 (HIDDEN_APP)
-5. 内容供应节点(CONTENT_PROVIDER)
-6. 空进程(EMPTY_APP)
+5. 空进程(EMPTY_APP)
 
 当service运行在低内存的环境时，将会kill掉一些存在的进程。因此进程的优先级将会很重要，可以使用startForeground 将service放到前台状态。这样在低内存时被kill的几率会低一些。
 ```java

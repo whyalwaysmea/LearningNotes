@@ -63,7 +63,6 @@
 * [Android中的IPC方式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E4%B8%AD%E7%9A%84IPC%E6%96%B9%E5%BC%8F.md)
 
 ### [线程和线程池](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E6%B1%A0.md)
-### 异步操作
 ### [Android 进程保活招式大全](http://mp.weixin.qq.com/s?__biz=MzA3NTYzODYzMg==&mid=2653577617&idx=1&sn=623256a2ff94641036a6c9eea17baab8&scene=1&srcid=0818EecQYYkaSkd5HD8WjDf8#rd)
 
 ----

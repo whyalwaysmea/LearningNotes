@@ -60,3 +60,17 @@ registerReceiver(networkChangeReceiver, intentFilter);
 广播接收者中不要做一些耗时的工作，否则会弹出 Application No Response 错误对话框
 
 最好也不要在广播接收者中创建子线程做耗时的工作， 因为广播接收者被销毁后进程就成为了空进程，很容易被系统杀掉；
+
+### 关于BroadCastReceiver安全性的思考
+一般的广播都是系统级别的，所以我们要做一些措施来防止别人搞事。    
+1. 在自己的应用中，在manifest.xml中注册receiver的时候加入export属性，如下：
+```xml
+<receiver android:name="com.demo.MyBroadCastReceiver" android:exported="false">  
+    <intent-filter >  
+       <action android:name="com.demo.action"/>  
+
+   </intent-filter>  
+</receiver>  
+```
+2. 自定义权限，在manifest.xml中加入自定义权限，然后再响应的BroadCastReceiver中加入这个权限即可
+3. 使用LocalBroadcastManager来实现广播
