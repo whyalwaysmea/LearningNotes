@@ -19,7 +19,7 @@
 
 ### [ContentProvider](http://blog.csdn.net/coder_pig/article/details/47858489)
 
-### Fragment
+### [Fragment](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Fragment.md)
 
 ### Intent
 * [Flags](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Activity%20Flags.md)
@@ -80,10 +80,8 @@
 
 ---
 ## 网络
-### 基础的Http，Https，Socket
-### tcp/udp
-### Retrofit， Volley
-
+### Retrofit
+### Volley
 ### OKHttp
 * [Okhttpの缓存配置](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/OKHttp%E3%81%AE%E7%BC%93%E5%AD%98%E9%85%8D%E7%BD%AE.md)
 * [Okhttp源码解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/OkHttp%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)
