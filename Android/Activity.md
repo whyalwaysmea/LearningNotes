@@ -90,6 +90,17 @@ Activity在onCreate之前调用attach方法，在attach方法中会创建window�
 1. 利用 static 静态数据，public static 成员变量
 2. 利用外部存储的传输: file, SharedPreferences, 数据库（外部存储需要注意读写冲突）
 
+### Intent可以传递什么类型的参数
+Intent 可以传递的数据类型非常的丰富， java的基本数据类型和 String以及他们的数组形式都可以，除此之外还可以传递实现了 Serializable 和 Parcelable 接口的对象。
+
+Serializable和Parcelable的区别:   
+这两个方法是用来序列化数据的。  
+实现方式上不一样：一个只需要实现Serializable接口，并提供一个序列化版本id(serialVersionUID，避免反序列化失败)即可。另一个实现Parcelable接口之外还需要写几个方法。  
+1. 在使用内存的时候，Parcelable 类比Serializable性能高，所以推荐使用Parcelable类。
+2. Serializable在序列化的时候会产生大量的临时变量，从而引起频繁的GC。
+3. Parcelable不能使用在要将数据存储在磁盘上的情况，因为Parcelable不能很好的保证数据的持续性在外界有变化的情况下。尽管Serializable效率低点， 也不提倡用，但在这种情况下，还是建议你用Serializable 。
+4. Serializable是Java中就有的接口,Parcelable是Android中提供的新的序列化方式
+
 ### [关于获取当前Activity的一些思考](https://zhuanlan.zhihu.com/p/25221428?utm_source=qq&utm_medium=social)
 **反射：** 反射是我们经常会想到的方法，思路大概为
 
