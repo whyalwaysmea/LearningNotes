@@ -59,6 +59,11 @@ protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, i
 可以看到，这里传入了父View的一些参数。所以这里就可以说明，父View影响着子View的MeasureSpec生成
 第一步，没啥好说的；第二步和第三步都调用到了getChildMeasureSpec( )，在该方法内部又做了哪些操作呢？
 ```java
+/**
+ * @param spec 父view的详细测量值(MeasureSpec)
+ * @param padding view当前尺寸的的内边距和外边距(padding,margin)
+ * @param childDimension 子视图的布局参数（宽/高）
+ */
 public static int getChildMeasureSpec(int spec, int padding, int childDimension) {
     //获取父容器的specMode,specSize
    int specMode = MeasureSpec.getMode(spec);
@@ -66,17 +71,22 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
    // 得到父容器在水平方向或垂直方向可用的最大空间值
    int size = Math.max(0, specSize - padding);
 
+   //子view想要的实际大小和模式（需要计算）
    int resultSize = 0;
    int resultMode = 0;
    // 确定子View的specMode和specSize
    switch (specMode) {
+       // 当父View的mode为EXACTLY的时候， 子View都是确定的值
        case View.MeasureSpec.EXACTLY:
             // 当子View的宽或高为一个具体值，比如：100dp
            if (childDimension >= 0) {
+               // 实际大小就是想要的数值大小，
                resultSize = childDimension;
+               // 模式就为EXACTLY
                resultMode = MeasureSpec.EXACTLY;
            } else if (childDimension == LayoutParams.MATCH_PARENT) {
                // 当子View的宽或高为MATCH_PARENT
+               // 大小就是可用的最大空间
                resultSize = size;
                resultMode = MeasureSpec.EXACTLY;
            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
@@ -347,3 +357,5 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
 # 相关链接
 [自定义View系列教程02--onMeasure源码详尽分析](http://blog.csdn.net/lfdfhl/article/details/51347818)
+
+[自定义View Measure过程 - 最易懂的自定义View原理系列（2）](http://www.jianshu.com/p/1dab927b2f36#)
