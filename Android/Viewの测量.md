@@ -76,7 +76,6 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
    int resultMode = 0;
    // 确定子View的specMode和specSize
    switch (specMode) {
-       // 当父View的mode为EXACTLY的时候， 子View都是确定的值
        case View.MeasureSpec.EXACTLY:
             // 当子View的宽或高为一个具体值，比如：100dp
            if (childDimension >= 0) {
@@ -133,7 +132,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 ```
 上述方法不难理解，它的主要作用是根据父容器的MeasureSpec同时结合View本身的LayoutParams来确定子元素的MeasureSpec.
 该方法就是确定子View的MeasureSpec的具体实现。
-![](http://img.blog.csdn.net/20160510112048981)
+![](http://upload-images.jianshu.io/upload_images/944365-6caa765e896a02a2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 刚才我们讨论的是：measureChildWithMargins( )调用getChildMeasureSpec( )
 除此以外还有一种常见的操作：
@@ -145,8 +144,13 @@ measureChild( )调用getChildMeasureSpec( )
 3. 在measureChild( )计算父View所占空间为mPaddingLeft + mPaddingRight，即父容器左右两侧的padding值之和
 4. measureChildWithMargins( )计算父View所占空间为mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin+ widthUsed。此处，除了父容器左右两侧的padding值之和还包括了子View左右的margin值之和( lp.leftMargin + lp.rightMargin)，因为这两部分也是不能用来摆放子View的应算作父View已经占用的空间。这点从方法名measureChildWithMargins也可以看出来它是考虑了子View的margin所占空间的。
 
+# measure
+measure过程要分情况来看：
+* 原始的View，那么通过measure方法就完成了其测量过程
+* ViewGroup除了完成自己的测量过程外，还会遍历去调用所有字元素的measure方法，各个子元素再递归去执行这个流程
 
-# onMeasure()
+## View#onMeasure()
+View的measure过程由其measure方法来完成，measure方法是一个final类型的方法，这意味着子类不能重写此方法，在View的measure方法中会去调用View的onMeasure方法，因此只需要看onMeasure的实现即可。
 ```java
 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {  
    setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),  
@@ -155,7 +159,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 ```
 onMeasure( )源码流程如下:
 
-1. 在onMeasure调用setMeasuredDimension( )设置View的宽和高.
+1. 在onMeasure中调用setMeasuredDimension( )设置View的宽和高.
 2. 在setMeasuredDimension()中调用getDefaultSize()获取View的宽和高.
 3. 在getDefaultSize()方法中又会调用到getSuggestedMinimumWidth()或者getSuggestedMinimumHeight()获取到View宽和高的最小值.
 
@@ -197,7 +201,7 @@ public static int getDefaultSize(int size, int measureSpec) {
 
 最后通过调用setMeasuredDimension()方法，来设置View的宽和高的测量值。
 
-# 如何重写onMeasure()
+### 如何重写onMeasure()
 刚才有说到：“View类默认的onMeasure()方法只支持EXACTLY模式，所以如果在自定义控件的时候，想让自定义View支持wrap_content属性，那么就必须重写onMeasure()方法来指定wrap_content时的大小”，那么如何重写onMeasure()方法来指定wrap_content时的大小呢？
 以下是一个简单的例子
 ```java
@@ -218,7 +222,10 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
  }
 ```
 
-# 获取View的宽/高
+## ViewGroup#measure
+
+# Q&A
+## 获取View的宽/高
 当我们想在Activity已启动的时候做一件任务，但是这一件任务需要获取某个View的宽/高。但是因为View的measure过程和Activity生命周期方法不是同步执行的，所以无法保证Activity执行了onCreate(),onStart(),onResume()时某个View已经测量完毕了，如果View还没有测量完毕，那么获取到的宽/高就是0.
 那么我们来看看到底有哪些方法来在Activity中获取宽/高
 
@@ -263,7 +270,7 @@ viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutLi
 4.view.measure(int widthMeasureSpec, int heightMeasureSpec);
 通过手动对View进行measure来得到View的宽/高。
 
-# ScrollView嵌套ListView问题解析
+## ScrollView嵌套ListView问题解析
 在ScrollView中嵌套ListView显示是不正常的，确切地说是只会显示ListView的第一个项。
 那么为什么会造成这样的显示不正常呢？ 我们应该能够想到，是ListView在测量自己高度的时候出现了问题，但是我们知道子View的测量模式是由父View决定的，那么我们就先来查看一下ScrollView的源码
 ```java
