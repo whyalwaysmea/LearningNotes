@@ -194,9 +194,12 @@ public static int getDefaultSize(int size, int measureSpec) {
     return result;
 }
 ```
-因为MeasureSpec.UNSPECIFIED这种情况可以不考虑，所以在measure阶段View的宽和高由其measureSpec中的specSize决定！！
+因为MeasureSpec.UNSPECIFIED这种情况可以不考虑，所以在measure阶段View的宽和高由其measureSpec中的specSize决定！！     
+
 结合刚才的图发现一个问题：在该图的最后一行，如果子View在XML布局文件中对于大小的设置采用wrap_content，那么不管父View的specMode是MeasureSpec.AT_MOST还是MeasureSpec.EXACTLY对于子View而言系统给它设置的specMode都是MeasureSpec.AT_MOST，并且其大小都是parentLeftSize即父View目前剩余的可用空间。这时wrap_content就失去了原本的意义，变成了match_parent一样了.
-所以自定义View在重写onMeasure()的过程中应该手动处理View的宽或高为wrap_content的情况。
+
+所以自定义View在重写onMeasure()的过程中应该手动处理View的宽或高为wrap_content的情况。   
+
 这也在《Android群英传》中有提到，“View类默认的onMeasure()方法只支持EXACTLY模式，所以如果在自定义控件的时候，想让自定义View支持wrap_content属性，那么就必须重写onMeasure()方法来指定wrap_content时的大小”。可以查看系统中的其他组件，它们大都是重写了onMeasure()方法的
 
 最后通过调用setMeasuredDimension()方法，来设置View的宽和高的测量值。
@@ -223,6 +226,53 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 ```
 
 ## ViewGroup#measure
+ViewGroup除了完成自己的测量过程外，还会遍历去调用所有字元素的measure方法，各个子元素再递归去执行这个流程。     
+请注意ViewGroup是一个抽象类，它没有重写View的onMeasure( )但它提供了measureChildren( )测量所有的子View。在measureChildren()方法中调用measureChild( )测量每个子View，在该方法内又会调用到child.measure( )方法，这又回到了前面熟悉的流程。     
+>measureChildren( )—>measureChild( )—>child.measure( )   
+
+```java
+//参数说明：父视图的测量规格（MeasureSpec）
+protected void measureChildren(int widthMeasureSpec, int heightMeasureSpec) {
+    final int size = mChildrenCount;
+    final View[] children = mChildren;
+
+    //遍历所有的子view
+    for (int i = 0; i < size; ++i) {
+        final View child = children[i];
+        //如果View的状态不是GONE就调用measureChild()去进行下一步的测量
+        if ((child.mViewFlags & VISIBILITY_MASK) != GONE) {
+            measureChild(child, widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+}
+```
+ViewGroup通过循环，调用measureChild, measureChild类似于最开始讲解的measureChildWithMargins()，计算单个子View的MeasureSpec。  
+然后在measureChild中调用了子View的measure()进行每个子View最后的宽 / 高测量
+
+### onMeasure()
+ViewGroup是一个抽象类，自身没有重写View的onMeasure();    
+因为不同的ViewGroup子类(LinearLayout、RelativeLayout或自定义ViewGroup子类等)具备不同的布局特性，这导致他们子View的测量方法各有不同；而onMeasure()的作用在于测量View的宽/高值。    
+因此，ViewGroup无法对onMeasure()作统一实现。   
+
+在自定义View中，关键在于根据你的自定义View去复写onMeasure()从而实现你的子View测量逻辑。复写onMeasure()的模板如下：
+```java
+@Override
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {  
+
+    //定义存放测量后的View宽/高的变量
+    int widthMeasure ;
+    int heightMeasure ;
+
+    //定义测量方法
+    void measureCarson{
+        //TODO 定义测量的具体逻辑
+
+    }
+
+    //记得！最后使用setMeasuredDimension()  存储测量后View宽/高的值
+    setMeasuredDimension(widthMeasure,  heightMeasure);  
+}
+```
 
 # Q&A
 ## 获取View的宽/高
