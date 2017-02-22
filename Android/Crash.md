@@ -218,3 +218,5 @@ public class App extends Application  {
 ## 相关链接
 
 [有哪些比较好的Android异常（crash、ANR、内存泄漏等等）处理机制？](https://www.zhihu.com/question/48357858)
+
+[Android处理崩溃的一些实践](https://zhuanlan.zhihu.com/p/25341147)
