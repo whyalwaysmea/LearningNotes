@@ -60,3 +60,31 @@ mGestureDetector.setIsLongPressEnabled(false);
 boolean consume = mGestureDetector.onTouchEvent(event);
 return consume;
 ```
+
+# 相关方法
+## inflate
+我们经常会使用到如下的方法
+```java
+LayoutInflater.from(mContext).inflate(int resource, ViewGroup root, boolean attachToRoot);
+```
+* 如果root为null，attachToRoot将失去作用，设置任何值都没有意义。返回resource对应的View
+* 如果root不为null，attachToRoot设为true，则会给加载的布局文件的指定一个父布局，即root。然后返回root
+* 如果root不为null，attachToRoot设为false，则会将布局文件最外层的所有layout属性进行设置，当该view被添加到父view当中时，这些layout属性会自动生效。
+
+[Android LayoutInflater原理分析，带你一步步深入了解View(一)](http://blog.csdn.net/guolin_blog/article/details/12921889)   
+[Android LayoutInflater深度解析 给你带来全新的认识](http://blog.csdn.net/lmj623565791/article/details/38171465)
+
+## onFinishInflate
+当View中所有的子控件均被映射成xml后触发   
+
+## onSizeChanged
+当view的大小发生变化时触发
+
+## requestLayout
+会导致调用measure()过程 和 layout()过程 。
+
+## invalidate
+invalidate使用的非常频繁，它会触发View的重新绘制，也就是绘制流程的draw过程，但不会调用测量和布局过程。需要在主线程中调用
+
+## postInvalidate
+在子线程更新UI，postInvalidate内部实现也是使用handler来发送msg到主线程然后调用invalidate。

@@ -134,7 +134,7 @@
 ---
 ## 性能优化
 ### [内存泄漏](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F.md)
-### [Android应用瘦身](http://www.jianshu.com/p/31ba2d0e9a60)
+### [Android应用瘦身](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%BA%94%E7%94%A8%E7%98%A6%E8%BA%AB.md)
 
 ---
 ## 多媒体
