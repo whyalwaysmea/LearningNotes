@@ -79,11 +79,7 @@
 ### 序列化
 ### Android文件系统
 ### [Android存储挖坑记](http://blog.desmondyao.com/android-storage/)
----
-## 多媒体
-### 视频
-### 音频
-### 拍照
+
 
 ---
 ## 网络
@@ -113,7 +109,21 @@
 ### Room适配
 
 ---
-## JNI与NDK
+## 第三方库
+### 推送
+### IM
+### ButterKnife
+* [ButterKnife源码解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/ButterKnife%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)
+* [APT使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/APT.md)
+
+### Orm
+### [EventBus](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/EventBus.md)
+### RxJava
+* <a href="https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/RxJava%E3%81%AEobserveOn()%E4%B8%8EsubscribeOn().md">线程调度</a>
+
+### Dagger2
+* [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/dagger.md)
+* [Dagger2生成代码分析](#)
 
 ---
 ## 测试
@@ -127,7 +137,27 @@
 ### [Android应用瘦身](http://www.jianshu.com/p/31ba2d0e9a60)
 
 ---
-## 应用安全
+## 多媒体
+### 视频
+### 音频
+### 拍照
+
+---
+## 进阶
+### Android的动态加载技术
+### 热更新
+### 增量更新
+### 组件化
+
+---
+## 项目构建
+### JCenter
+### [65535方法数限制のMultiDex](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Multidex.md)
+### [多渠道打包](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%A4%9A%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85.md)
+### [混淆](http://droidyue.com/blog/2016/07/10/understanding-android-obfuscated-code-by-proguard/)
+### AndroidManifest
+### 权限管理
+### adb
 
 ---
 ## 混合编程
@@ -136,15 +166,7 @@
 ### Hybrid App
 
 ---
-## 项目构建
-### JCenter
-### [65535方法数限制のMultiDex](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Multidex.md)
-### [多渠道打包](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%A4%9A%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85.md)
-### 混淆
-### AndroidManifest
-### 权限管理
-### adb
-
+## JNI与NDK
 
 ---
 ## 开发相关
@@ -157,30 +179,6 @@
 ### Flux
 ### 设计模式
 
----
-## 进阶
-### Android的动态加载技术
-### 热更新
-### 增量更新
-### 组件化
-
----
-## 第三方库
-### 推送
-### IM
-### 网络
-### ButterKnife
-* [ButterKnife源码解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/ButterKnife%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.md)
-* [APT使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/APT.md)
-
-### Orm
-### [EventBus](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/EventBus.md)
-### RxJava
-* <a href="https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/RxJava%E3%81%AEobserveOn()%E4%B8%8EsubscribeOn().md">线程调度</a>
-
-### Dagger2
-* [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/dagger.md)
-* [Dagger2生成代码分析](#)
 
 ---
 ## 相关链接
