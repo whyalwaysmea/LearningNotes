@@ -89,6 +89,7 @@ Activity在onCreate之前调用attach方法，在attach方法中会创建window�
 ### 两个Activity之间传递数据，除了intent，广播接收者，contentprovider还有啥？
 1. 利用 static 静态数据，public static 成员变量
 2. 利用外部存储的传输: file, SharedPreferences, 数据库（外部存储需要注意读写冲突）
+3. 事件总线
 
 ### Intent可以传递什么类型的参数
 Intent 可以传递的数据类型非常的丰富， java的基本数据类型和 String以及他们的数组形式都可以，除此之外还可以传递实现了 Serializable 和 Parcelable 接口的对象。

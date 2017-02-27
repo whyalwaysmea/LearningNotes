@@ -353,3 +353,5 @@ private boolean postSingleEventForEventType(Object event, PostingThreadState pos
 [EventBus源码分析](http://www.jianshu.com/p/1b68ace4600a#)  
 
 [Android事件传递三部曲：事件总线EventBus](https://shaohui.me/2017/01/20/android-messaging-2-eventbus/)
+
+[EventBus源码解析](http://www.jianshu.com/p/4d695bfa49e1#)
