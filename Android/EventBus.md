@@ -299,19 +299,57 @@ private void postSingleEvent(Object event, PostingThreadState postingState) thro
             subscriptionFound |= postSingleEventForEventType(event, postingState, clazz);
         }
     } else {
+        // 返回的结果为是否找到了对应的订阅方法
         subscriptionFound = postSingleEventForEventType(event, postingState, eventClass);
     }
+    // 如果没有找到
     if (!subscriptionFound) {
+        // 打印Log信息和发送事件处理
         if (logNoSubscriberMessages) {
             Log.d(TAG, "No subscribers registered for event " + eventClass);
         }
+        // 如果当我们调用post()方法发出某个事件时想知道我们的事件有没有被订阅者接收，就可以在发送消息的类中接收NoSubscriberEvent事件，
+        // 如果收到该事件说明应用中没有订阅者接收我们发出的事件。
         if (sendNoSubscriberEvent && eventClass != NoSubscriberEvent.class &&
                 eventClass != SubscriberExceptionEvent.class) {
             post(new NoSubscriberEvent(this, event));
         }
     }
 }
+
+
+private boolean postSingleEventForEventType(Object event, PostingThreadState postingState, Class<?> eventClass) {
+    // 线程安全的
+    CopyOnWriteArrayList<Subscription> subscriptions;
+    // HashMap不是线程安全的，所以这里需要同步代码块
+    synchronized (this) {
+        subscriptions = subscriptionsByEventType.get(eventClass);
+    }
+    if (subscriptions != null && !subscriptions.isEmpty()) {
+        for (Subscription subscription : subscriptions) {
+            postingState.event = event;
+            postingState.subscription = subscription;
+            boolean aborted = false;
+            try {
+                postToSubscription(subscription, event, postingState.isMainThread);
+                aborted = postingState.canceled;
+            } finally {
+                postingState.event = null;
+                postingState.subscription = null;
+                postingState.canceled = false;
+            }
+            if (aborted) {
+                break;
+            }
+        }
+        return true;
+    }
+    return false;
+}
 ```
 
 
 ## 相关链接
+[EventBus源码分析](http://www.jianshu.com/p/1b68ace4600a#)  
+
+[Android事件传递三部曲：事件总线EventBus](https://shaohui.me/2017/01/20/android-messaging-2-eventbus/)
