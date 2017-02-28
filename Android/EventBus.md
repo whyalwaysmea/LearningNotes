@@ -116,9 +116,55 @@ public void register(Object subscriber) {
     }
 }
 ```
-这里做了两件事：
+这里做了两件事：  
+
 1. 找出subscriber的所有订阅方法。
 2. 调用订阅方法,subscribe(subscriber, subscriberMethod);调用这里有一个subscriber和SubscriberMethod
+
+
+这里我们先看看，是怎么通过subscriberMethodFinder找到订阅者订阅了哪些事件的：
+SubscriberMethodFinder 的作用说白了其实就是寻找订阅者的订阅方法。正如在上面的代码中提到的那样， findSubscriberMethods 方法可以返回指定订阅者中的所有订阅方法。
+```java
+List<SubscriberMethod> findSubscriberMethods(Class<?> subscriberClass) {
+    //先从METHOD_CACHE取看是否有缓存,key:保存订阅类的类名,value:保存类中订阅的方法数据,
+    List<SubscriberMethod> subscriberMethods = METHOD_CACHE.get(subscriberClass);
+    if (subscriberMethods != null) {
+        return subscriberMethods;
+    }
+    //是否忽略注解器生成的MyEventBusIndex类
+    if (ignoreGeneratedIndex) {
+        //利用反射来读取订阅类中的订阅方法信息
+        subscriberMethods = findUsingReflection(subscriberClass);
+    } else {
+        //从注解器生成的MyEventBusIndex类中获得订阅类的订阅方法信息
+        subscriberMethods = findUsingInfo(subscriberClass);
+    }
+    if (subscriberMethods.isEmpty()) {
+        throw new EventBusException("Subscriber " + subscriberClass
+                + " and its super classes have no public methods with the @Subscribe annotation");
+    } else {
+        //保存进METHOD_CACHE缓存
+        METHOD_CACHE.put(subscriberClass, subscriberMethods);
+        return subscriberMethods;
+    }
+}
+
+private List<SubscriberMethod> findUsingReflection(Class<?> subscriberClass) {
+    //FindState 用来做订阅方法的校验和保存
+    FindState findState = prepareFindState();
+    findState.initForSubscriber(subscriberClass);
+    while (findState.clazz != null) {
+        //通过反射来获得订阅方法信息
+        findUsingReflectionInSingleClass(findState);
+        //查找父类的订阅方法
+        findState.moveToSuperclass();
+    }
+    //获取findState中的SubscriberMethod(也就是订阅方法List)并返回
+    return getMethodsAndRelease(findState);
+}
+```
+
+
 
 在看订阅方法之前，我们先了解两个类:
 ```java
@@ -184,7 +230,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
     int size = subscriptions.size();
     for (int i = 0; i <= size; i++) {
        if (i == size || subscriberMethod.priority > subscriptions.get(i).subscriberMethod.priority) {
-           subscriptions.add(i, newSubscription);			                                        // 3
+           subscriptions.add(i, newSubscription);			                                        
            break;
        }
     }
@@ -434,7 +480,65 @@ void invokeSubscriber(Subscription subscription, Object event) {
     }
 }
 ```
+![Post流程](http://upload-images.jianshu.io/upload_images/1485091-b7b63f83d65903d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+## Q&A
+### EventBus怎么实现事件中途取消
+这个我们在分析postSingleEvent()的方法时提到了，每次根据事件类型找到对应的订阅列表以后，然后就开始循环挨个分发，在循环中，没执行完一次就会检查一次postingState的cancel状态，如果已经取消，将直接终止循环，这个事件的分发到此结束，也就实现了事件分发过程中的中途取消。
+
+### 订阅了同一个事件的Subscriber之间的分发顺序是怎么确定的？
+我们在分析register()源码的时候，注意到将subscriber和subscriberMethod添加到订阅列表时，会检查subscriberMethod的priority属性，列表中的元素都是按照priority从大到小排序，相同priority会按照添加顺序排序，先加入的会在前面
+
+### 在不需要的时候需要手动解除绑定吗？不解除绑定会导致内存泄露吗？
+这两个问答的答案都是肯定的，在subscriber被销毁之前一定好手动解除绑定，否则会导致内存泄露，因为我们在添加订阅的时候会在订阅列表中添加subscriber的引用，了解Java中GC机制的同学都知道，如果一个对象是在GC发生时依然是可到达的，那么它将不会被回收，这就导致了内存泄露，所以在不再需要的时候一定要调用取消订阅方法。
+
+### 为什么订阅方法必须是public
+这个问题的答案就在SubscriberMethodFinder中，首先说就是，是EventBus限制了订阅方法必须使用public，如果不是public，这个方法就不会被添加到订阅方法列表中，至于为什么EventBus为什么要限制这点，可以看下面这段代码：
+```java
+try {
+    methods = findState.clazz.getDeclaredMethods();
+} catch (Throwable th) {
+    methods = findState.clazz.getMethods();
+    findState.skipSuperClasses = true;
+}
+```
+这是在通过反射拿到subscriber的所有方法，getDeclaredMethods()确实是不管三七二十一，会把private方法也拿到，但是getMethods()则不然，它只能拿到标记为public的方法，所以我估计是EventBus为了规避风险，索性要求所有的订阅方法必须标记为public
+
+除了必须是public的之外，在使用注解的时候的：方法还不能是static，方法参数也只能有一个
+
+### 对比2.x版本
+注册方法不一样了
+```java
+//3.0版本的注册
+EventBus.getDefault().register(this);
+
+//2.x版本的注册
+EventBus.getDefault().register(this);
+EventBus.getDefault().register(this, 100);
+EventBus.getDefault().registerSticky(this, 100);
+EventBus.getDefault().registerSticky(this);
+```
+
+响应事件订阅方法不一样了
+```java
+//3.0版本
+@Subscribe(threadMode = ThreadMode.BACKGROUND, sticky = true, priority = 100)
+public void test(String str) {
+
+}
+
+//2.x版本
+public void onEvent(String str) {
+
+}
+public void onEventMainThread(String str) {
+
+}
+public void onEventBackgroundThread(String str) {
+
+}
+```
+最主要的还是因为3.0加入了注解功能，效率比反射要高
 
 ## 相关链接
 [EventBus源码分析](http://www.jianshu.com/p/1b68ace4600a#)  
