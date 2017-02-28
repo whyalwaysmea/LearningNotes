@@ -75,11 +75,12 @@ public EventBus() {
 }
 
 EventBus(EventBusBuilder builder) {
-    // 以事件类的class对象为键值，记录注册方法信息，值为一个Subscription的列表
+    //key:订阅的事件,value:订阅这个事件的所有订阅者集合
+    //private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> subscriptionsByEventType;
     subscriptionsByEventType = new HashMap<>();
-    // 以注册的类为键值，记录该类所注册的所有事件类型，值为一个Event的class对象的列表
+    //key:订阅者对象,value:这个订阅者订阅的事件集合
     typesBySubscriber = new HashMap<>();
-    // 记录sticky事件
+    //粘性事件 key:粘性事件的class对象, value:事件对象
     stickyEvents = new ConcurrentHashMap<>();
     // 三个Poster, 负责在不同的线程中调用订阅者的方法
     mainThreadPoster = new HandlerPoster(this, Looper.getMainLooper(), 10);
@@ -101,10 +102,15 @@ stickyEvents，是一个线程安全的Map,用来记录sticky事件，sticky事�
 ### 注册
 ```java
 public void register(Object subscriber) {
+    // 获得订阅者的class对象
     Class<?> subscriberClass = subscriber.getClass();
+    // 通过subscriberMethodFinder来找到订阅者订阅了哪些事件.返回一个SubscriberMethod对象的List,SubscriberMethod
+    //里包含了这个方法的Method对象,以及将来响应订阅是在哪个线程的ThreadMode,以及订阅的事件类型eventType,以及订阅的优
+    //先级priority,以及是否接收粘性sticky事件的boolean值.
     List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
     synchronized (this) {
         for (SubscriberMethod subscriberMethod : subscriberMethods) {
+            // 订阅
             subscribe(subscriber, subscriberMethod);
         }
     }
@@ -115,6 +121,23 @@ public void register(Object subscriber) {
 2. 调用订阅方法,subscribe(subscriber, subscriberMethod);调用这里有一个subscriber和SubscriberMethod
 
 在看订阅方法之前，我们先了解两个类:
+```java
+public class SubscriberMethod {
+    // 订阅的方法
+    final Method method;
+    // 订阅所在的线程
+    final ThreadMode threadMode;
+    // 订阅事件的类型
+    final Class<?> eventType;
+    // 优先级
+    final int priority;
+    // 订阅是否是粘性的
+    final boolean sticky;
+    // 特定字符串，用来比较两个 SubscriberMethod 是否为同一个
+    String methodString;
+    ...
+}
+```
 ```java
 // 这是订阅者和订阅方法类的一个契约关系类。所以类和方法唯一确定一条注册信息
 // active表示该注册信息是否有效
@@ -140,6 +163,7 @@ final class Subscription {
 ```java
 // Must be called in synchronized block
 private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
+     //获取订阅的事件类型
     Class<?> eventType = subscriberMethod.eventType;
     // 构建Subscription,Subscription
     Subscription newSubscription = new Subscription(subscriber, subscriberMethod);
@@ -149,6 +173,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
         subscriptions = new CopyOnWriteArrayList<>();
         subscriptionsByEventType.put(eventType, subscriptions);
     } else {
+        // 如果有就抛出异常
         if (subscriptions.contains(newSubscription)) {
             throw new EventBusException("Subscriber " + subscriber.getClass() + " already registered to event "
                     + eventType);
@@ -173,6 +198,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
 
     // 关于sticky
     if (subscriberMethod.sticky) {
+        // 是否支持事件继承
         if (eventInheritance) {
             // Existing sticky events of all subclasses of eventType have to be considered.
             // Note: Iterating over all events may be inefficient with lots of sticky events,
@@ -198,6 +224,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
 2. 将该注册信息保存到两个数据结构中。对于subscriptionsByEventType首先获取EventType对应的列表，没有则创建，重复注册则抛异常，正常情况下，则根据priority插入到列表中适合的位置。对于typesBySubscriber，则是更新该subscriber对应的列表即可。
 3. 处理sticky事件。在注册时，如果是监听sticky事件，则需要从stickyEvents中取出对应sticky事件，并发送到订阅者。
 
+![订阅流程](http://upload-images.jianshu.io/upload_images/1485091-8bf39ad48834f39c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ### 取消注册
 ```java
@@ -261,7 +288,9 @@ private final ThreadLocal<PostingThreadState> currentPostingThreadState = new Th
 /** Posts the given event to the event bus. */
 // 将事件发送到EventBus,还没有发送给订阅者
 public void post(Object event) {
+    //得到当前线程的Posting状态.
     PostingThreadState postingState = currentPostingThreadState.get();
+    //获取当前线程的事件队列
     List<Object> eventQueue = postingState.eventQueue;
     // 将要发送的事件添加到事件队列中
     eventQueue.add(event);
@@ -275,6 +304,7 @@ public void post(Object event) {
         try {
             while (!eventQueue.isEmpty()) {
                 // 这里进去了另外一个方法
+                //发送单个事件
                 postSingleEvent(eventQueue.remove(0), postingState);
             }
         } finally {
@@ -296,10 +326,13 @@ private void postSingleEvent(Object event, PostingThreadState postingState) thro
         int countTypes = eventTypes.size();
         for (int h = 0; h < countTypes; h++) {
             Class<?> clazz = eventTypes.get(h);
+             // 只要其中有一个 postSingleEventForEventType 返回 true ，那么 subscriptionFound 就为 true
+             // 发送给订阅类型为event ，以及它的父类或者接口
             subscriptionFound |= postSingleEventForEventType(event, postingState, clazz);
         }
     } else {
         // 返回的结果为是否找到了对应的订阅方法
+        // 发送给单个
         subscriptionFound = postSingleEventForEventType(event, postingState, eventClass);
     }
     // 如果没有找到
@@ -323,14 +356,18 @@ private boolean postSingleEventForEventType(Object event, PostingThreadState pos
     CopyOnWriteArrayList<Subscription> subscriptions;
     // HashMap不是线程安全的，所以这里需要同步代码块
     synchronized (this) {
+        // 得到订阅者
         subscriptions = subscriptionsByEventType.get(eventClass);
     }
     if (subscriptions != null && !subscriptions.isEmpty()) {
+        // 遍历订阅者
         for (Subscription subscription : subscriptions) {
             postingState.event = event;
             postingState.subscription = subscription;
+            // 是否被中断
             boolean aborted = false;
             try {
+                // 发给订阅者
                 postToSubscription(subscription, event, postingState.isMainThread);
                 aborted = postingState.canceled;
             } finally {
@@ -345,6 +382,56 @@ private boolean postSingleEventForEventType(Object event, PostingThreadState pos
         return true;
     }
     return false;
+}
+
+private void postToSubscription(Subscription subscription, Object event, boolean isMainThread) {
+   switch (subscription.subscriberMethod.threadMode) {
+       // 默认线程
+       // 对于是否在主线程执行无要求，但若 Post 线程为主线程，不能耗时的操作；
+       case POSTING:
+           invokeSubscriber(subscription, event);
+           break;
+       //  主线程中响应
+       case MAIN:
+           // 如果发布的线程是主线程，就直接响应事件
+           if (isMainThread) {
+               invokeSubscriber(subscription, event);
+           } else {
+               // 否则，通过Handler发送消息
+               mainThreadPoster.enqueue(subscription, event);
+           }
+           break;
+        // 后台线程
+       case BACKGROUND:
+           if (isMainThread) {
+               // 如果发布线程是主线程，那么启动唯一的后台线程去处理
+               backgroundPoster.enqueue(subscription, event);
+           } else {
+               // 如果发布的线程不是主线程，那么直接响应事件
+               invokeSubscriber(subscription, event);
+           }
+           break;
+       // 不论发布线程是否为主线程，都使用一个空闲线程来处理。
+       // 和BackgroundThread不同的是，Async类的所有线程是相互独立的，因此不会出现卡线程的问题。
+       // 适用场景：长耗时操作，例如网络访问。
+       case ASYNC:
+           asyncPoster.enqueue(subscription, event);
+           break;
+       default:
+           throw new IllegalStateException("Unknown thread mode: " + subscription.subscriberMethod.threadMode);
+   }
+}
+
+
+void invokeSubscriber(Subscription subscription, Object event) {
+    try {
+        // 通过反射执行订阅方法
+        subscription.subscriberMethod.method.invoke(subscription.subscriber, event);
+    } catch (InvocationTargetException e) {
+        handleSubscriberException(subscription, event, e.getCause());
+    } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Unexpected exception", e);
+    }
 }
 ```
 
