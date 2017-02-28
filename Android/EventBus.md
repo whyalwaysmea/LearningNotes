@@ -164,6 +164,30 @@ private List<SubscriberMethod> findUsingReflection(Class<?> subscriberClass) {
 }
 ```
 
+这里涉及到了使用注解来获取订阅类的订阅方法信息:
+#### Subscriber Index
+如果想要使用注解的方式来获取订阅类，那么需要进行更多的依赖
+```
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ eventBusIndex : 'com.example.myapp.MyEventBusIndex' ]
+            }
+        }
+    }
+}
+dependencies {
+    compile 'org.greenrobot:eventbus:3.0.0'
+    annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.0.1'
+}
+```
+这样配置以后就再build项目就会生成自定义的MyEventBusIndex文件，然后将这个文件添加到EventBus配置中：
+```java
+EventBus eventBus = EventBus.builder().addIndex(new MyEventBusIndex()).build();
+```
+这个就是SubscriberMethodFinder检查的SubscriberIndex文件，如果检查到这个文件存在，那么将使用这个文件中的信息注册Subscriber，反之则将用反射的方式.  
+
 
 
 在看订阅方法之前，我们先了解两个类:
