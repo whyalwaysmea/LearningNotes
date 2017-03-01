@@ -172,11 +172,19 @@ Observable
 ```
 假设这里我们是在主线程上调用这段代码，
 那么
->操作1，操作2是在io线程上，因为之后subscribeOn切换了线程
-操作3，操作4也是在io线程上，因为在subscribeOn切换了线程之后，并没有发生改变。
-操作5，操作6是在main线程上，因为在他们之前的observeOn切换了线程。
-特别注意那一段，对于操作5和操作6是无效的
-再简单点总结就是
-subscribeOn的调用切换之前的线程。
-observeOn的调用切换之后的线程。
-observeOn之后，不调用subscribeOn切换线程不再起作用，但是subscribeOn可以用于控制doOnSubscribe()的线程
+
+1. 操作1，操作2是在io线程上，因为之后subscribeOn切换了线程
+2. 操作3，操作4也是在io线程上，因为在subscribeOn切换了线程之后，并没有发生改变。
+3. 操作5，操作6是在main线程上，因为在他们之前的observeOn切换了线程。
+4. 特别注意那一段，对于操作5和操作6是无效的
+
+再简单点总结就是:  
+
+只有第一subscribeOn() 起作用（所以多个 subscribeOn() 无意义）；但是后面subscribeOn()可以控制doOnSubscribe(),doOnSubscribe()被subscribeOn()向下就近控制
+这个 subscribeOn() 控制从流程开始的第一个操作，直到遇到第一个 observeOn()；
+
+observeOn() 可以使用多次，每个 observeOn() 将导致一次线程切换()，这次切换开始于这次 observeOn() 的下一个操作；  
+
+不论是 subscribeOn() 还是 observeOn()，每次线程切换如果不受到下一个 observeOn() 的干预，线程将不再改变，不会自动切换到其他线程。
+
+如果第一个subscribeOn()出现在observeOn()后面，那么subscribeOn()只能改变observeOn()前面的线程。
