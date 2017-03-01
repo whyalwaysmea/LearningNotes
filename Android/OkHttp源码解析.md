@@ -426,6 +426,24 @@ public final class RealInterceptorChain implements Interceptor.Chain {
 ### 两个版本之间的区别
 在或之前的源码中，从请求到响应会嵌套了很多方法，并且有两个 chain，一个传给 interceptor，一个传给 networkinterceptor，并且两个 interceptor 处理的位置都不一样，光 networkinterceptor 的调用位置我都找了半天，总之看代码真的需要耐心，现在只通过一个 chain 并且通过不断传给在不同顺序的 interceptor，每个 interceptor 做不同的操作来解决整个操作，逻辑清晰
 
+# Q&A
+### 每个 body 只能被消费一次，多次消费会抛出异常, [why?](https://github.com/square/okhttp/issues/1240#issuecomment-233655904)
+```java
+if (!forWebSocket || response.code() != 101) {
+  response = response.newBuilder()
+      .body(httpCodec.openResponseBody(response))
+      .build();
+}
+```
+由 HttpCodec#openResponseBody 提供具体 HTTP 协议版本的响应 body，而 HttpCodec 则是利用 Okio 实现具体的数据 IO 操作。
+
+ResponseBody必须关闭，不然可能造成资源泄漏
+
+如果ResponseBody中的数据很大，则不应该使用bytes() 或 string()方法，它们会将结果一次性读入内存，而应该使用byteStream()或 charStream()，以流的方式读取数据。
+
+
+### 每个Call对象只能执行一次请求 why?
+
 # 相关链接
 [OkHttp3 源码浅析](http://w4lle.github.io/2016/12/06/OkHttp/)
 
