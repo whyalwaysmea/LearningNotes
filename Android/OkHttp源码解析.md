@@ -441,6 +441,9 @@ ResponseBody必须关闭，不然可能造成资源泄漏
 
 如果ResponseBody中的数据很大，则不应该使用bytes() 或 string()方法，它们会将结果一次性读入内存，而应该使用byteStream()或 charStream()，以流的方式读取数据。
 
+Because response body can be huge so OkHttp doesn’t store it in memory, it reads it as a stream from network when you need it.
+
+When you read body as a string() OkHttp downloads response body and returns it to you without keeping reference to the string, it can’t be downloaded twice without new request.
 
 ### 每个Call对象只能执行一次请求 why?
 
