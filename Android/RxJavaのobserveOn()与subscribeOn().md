@@ -181,7 +181,7 @@ Observable
 再简单点总结就是:  
 
 只有第一subscribeOn() 起作用（所以多个 subscribeOn() 无意义）；但是后面subscribeOn()可以控制doOnSubscribe(),doOnSubscribe()被subscribeOn()向下就近控制
-这个 subscribeOn() 控制从流程开始的第一个操作，直到遇到第一个 observeOn()；
+subscribeOn() 控制从流程开始的第一个操作，直到遇到第一个 observeOn()；
 
 observeOn() 可以使用多次，每个 observeOn() 将导致一次线程切换()，这次切换开始于这次 observeOn() 的下一个操作；  
 
