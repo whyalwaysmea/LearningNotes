@@ -141,5 +141,19 @@ Fresco 的 Drawees 设计，带来一些有用的特性：
 #### 动图加载
 加载Gif图和WebP动图在任何一个Android开发者眼里看来都是一件非常头疼的事情。每一帧都是一张很大的Bitmap，每一个动画都有很多帧。Fresco让你没有这些烦恼，它处理好每一帧并管理好你的内存。
 
+### 比较
+以上说的都是一些Fresco的特性或者说强大的地方吧。但是它也有一些不是那么完美的地方：
+#### 包大小
+Fresco > Glide > Picasso
+
+#### 操作
+使用 DraweeView 时，请不要使用任何 ImageView 的属性: 在后续的版本中，DraweeView 会直接从 View 派生。任何属于 ImageView 但是不属于 View 的方法都会被移除。
+
+Drawee永远会在getIntrinsicHeight/getIntrinsicWidth中返回-1。所以不能在xml中直接设置宽高为wrap_content
+
+Fresco获取Bitmap的操作比较麻烦
+
 ## 相关链接
 [Introduction to Glide, Image Loader Library for Android, recommended by Google](https://inthecheesefactory.com/blog/get-to-know-glide-recommended-by-google/en)
+
+[Fresco | 专为ANDROID加载图片 | Fresco](https://www.fresco-cn.org/)
