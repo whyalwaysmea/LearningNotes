@@ -8,6 +8,8 @@
 [反射](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/%E5%8F%8D%E5%B0%84.md)
 
 ## 集合
+[ArrayList](http://www.jianshu.com/p/085a5ba2aca8)
+
 [HashMap](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/HashMap.md)
 
 ## 关键字
