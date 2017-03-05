@@ -8,4 +8,4 @@
 
 ### [设计模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/Desing%20pattern.md)
 
-### [算法]()
+### [算法](https://github.com/whyalwaysmea/LearningNotes/blob/master/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95.md)
