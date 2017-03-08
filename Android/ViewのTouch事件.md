@@ -1,6 +1,24 @@
 # View对Touch事件的处理
 ![View的Touch事件](http://img.blog.csdn.net/20160601225357520)
 
+```java
+public boolean dispatchTouchEvent(MotionEvent event) {  
+    // mOnTouchListener就是在setOnTouchListener方法里赋值
+    // 第二个条件为控件是否是enable的
+    // mOnTouchListener.onTouch其实也就是去回调控件注册touch事件时的onTouch方法
+
+    if (mOnTouchListener != null && (mViewFlags & ENABLED_MASK) == ENABLED &&  
+            mOnTouchListener.onTouch(this, event)) {  
+        return true;  
+    }  
+    // 如果mOnTouchListener.onTouch返回true就不会执行到这里来
+    // 如果返回false就会执行这里
+    // 可以看出来，mOnTouchListener.onTouch比onTouchEvent先执行
+    return onTouchEvent(event);  
+}  
+```
+在`onTouchEvent`中，如果View是可以点击的话，就会返回true，如果不能点击就返回了false
+
 1. View处理Touch事件的总体流程
 dispatchTouchEvent()—>onTouch()—>onTouchEvent()—>onClick()
 Touch事件最先传入dispatchTouchEvent()中；如果该View存在TouchListener那么会调用该监听器中的onTouch()。在此之后如果Touch事件未被消费，则会执行到View的onTouchEvent()方法，在该方法中处理ACTION_UP事件时若该View存在ClickListener则会调用该监听器中的onClick()
@@ -46,7 +64,36 @@ View–>内层ViewGroup–>外层ViewGroup–>Activity
 在Touch事件的传递过程中，如果上一级拦截了Touch那么其下一级就无法在收到Touch事件。  
 在Touch事件的消费过程中，如果下一级消费Touch事件那么其上一级就无法处理Touch事件。
 
-
+在ViewGroup的`dispatchTouchEvent`方法中，
+有如下一个判断
+```java
+// disallowIntercept是指是否禁用掉事件拦截的功能，默认是false，也可以通过调用requestDisallowInterceptTouchEvent方法对这个值进行修改。
+// 可以看出，如果onInterceptTouchEvent返回true，就不会进行条件判断内部了
+if (disallowIntercept || !onInterceptTouchEvent(ev))
+```
+接下来我们看看上面的那个条件判断内部是怎么样的
+```java
+// 遍历了当前ViewGroup下的所有子View
+for (int i = count - 1; i >= 0; i--) {  
+    final View child = children[i];
+    ...
+    // 判断当前遍历的View是不是正在点击的View
+    if (frame.contains(scrolledXInt, scrolledYInt)) {  
+        final float xc = scrolledXFloat - child.mLeft;  
+        final float yc = scrolledYFloat - child.mTop;  
+        ev.setLocation(xc, yc);  
+        child.mPrivateFlags &= ~CANCEL_NEXT_UP_EVENT;  
+        // 调用了该View的dispatchTouchEvent
+        // 如果该View是可以点击的，那么就返回true
+        // 后面的代码无法执行到了
+        if (child.dispatchTouchEvent(ev))  {  
+            mMotionTarget = child;  
+            return true;  
+        }  
+    }  
+}
+```
+如果在遍历了子View都没有返回true的话，就会执行后面的代码，调用super.dispatchTouchEvent(ev)。
 
 # 滑动冲突
 在开发中时常遇到一个棘手的问题：Touch事件的滑动冲突。比如ListView嵌套ScrollView，ViewPager嵌套ScrollView，ListView嵌套ScrollView时常常发生。
@@ -144,4 +191,8 @@ public boolean onInterceptTouchEvent(MotionEvent ev) {
 
 # 相关链接
 [图解 Android 事件分发机制](http://www.jianshu.com/p/e99b5e8bd67b#)
+
 [详解Touch事件](http://blog.csdn.net/lfdfhl/article/details/51603088)
+
+[Android事件分发机制完全解析，带你从源码的角度彻底理解(上)](http://blog.csdn.net/guolin_blog/article/details/9097463)
+[Android事件分发机制完全解析，带你从源码的角度彻底理解(下)](http://blog.csdn.net/guolin_blog/article/details/9153747)
