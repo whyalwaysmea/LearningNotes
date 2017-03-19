@@ -1,4 +1,5 @@
-﻿## [基础知识](https://github.com/whyalwaysmea/LearningNotes/tree/master/Android)
+
+## [基础知识](https://github.com/whyalwaysmea/LearningNotes/tree/master/Android)
 
 ### Context
 [Context完全解析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Context.md)
@@ -55,10 +56,8 @@
 
 ----
 ## 资源相关
-### Resourc
-### R文件相关
+### [资源文件相关](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E7%9B%B8%E5%85%B3.md)
 ### [Drawable](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Drawable.md)
-### mipmap
 ### 换肤/夜间模式
 
 
