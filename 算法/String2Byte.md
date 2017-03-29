@@ -3,17 +3,55 @@
 在java中，byte的范围是-128~127
 
 ```java
-public static String toHex(byte b) {  
-    // 返回为无符号整数基数为16的整数参数的字符串表示形式
-    String result = Integer.toHexString(b & 0xFF);  
-    if (result.length() == 1) {  
-        result = '0' + result;  
+/**
+ * 16进制字符串转换为字符串
+ *  
+ * @param s
+ * @return
+ */  
+public static String hexStringToString(String s) {  
+    if (s == null || s.equals("")) {  
+        return null;  
     }  
-    return result;  
+    s = s.replace(" ", "");  
+    byte[] baKeyword = new byte[s.length() / 2];  
+    for (int i = 0; i < baKeyword.length; i++) {  
+        try {  
+            baKeyword[i] = (byte) (0xff & Integer.parseInt(  
+                    s.substring(i * 2, i * 2 + 2), 16));  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+    }  
+    try {  
+        s = new String(baKeyword, "gbk");  
+        new String();  
+    } catch (Exception e1) {  
+        e1.printStackTrace();  
+    }  
+    return s;  
 }  
-```
 
-```java
+/**
+ * 字符串转十六进制字符串
+ * @param s
+ * @return
+ */
+public static String stringToHexString(String s) {  
+    String str = "";  
+    for (int i = 0; i < s.length(); i++) {  
+        int ch = (int) s.charAt(i);  
+        String s4 = Integer.toHexString(ch);  
+        str = str + s4;  
+    }  
+    return str;  
+}  
+
+/**
+ * 十六进制字符串转byte数组
+ * @param hexString
+ * @return
+ */
 public static byte[] hexStringToBytes(String hexString) {
 	if (hexString == null || hexString.equals("")) {
 		return null;
