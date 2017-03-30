@@ -180,6 +180,9 @@
 ### Flux
 ### 设计模式
 
+---
+## 面试
+### [Android 名企面试题及涉及知识点整理](http://www.jianshu.com/p/735be5ece9e8?utm_source=desktop&utm_medium=timeline#)
 
 ---
 ## 相关链接

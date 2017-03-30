@@ -7,6 +7,8 @@
 
 [反射](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/%E5%8F%8D%E5%B0%84.md)
 
+[类加载机制](http://www.jianshu.com/p/b6547abd0706?utm_source=desktop&utm_medium=timeline)
+
 ## 集合
 [ArrayList](http://www.jianshu.com/p/085a5ba2aca8)
 
