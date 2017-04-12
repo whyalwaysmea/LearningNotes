@@ -16,6 +16,8 @@
 
 [HashMap](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/HashMap.md)
 
+[HashSet]()
+
 ## 关键字
 [synchronized](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/synchronized.md)
 
