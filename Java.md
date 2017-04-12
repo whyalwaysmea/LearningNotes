@@ -9,6 +9,8 @@
 
 [类加载机制](http://www.jianshu.com/p/b6547abd0706?utm_source=desktop&utm_medium=timeline)
 
+[依赖注入](http://www.itdadao.com/articles/c15a632075p0.html)
+
 ## 集合
 [ArrayList](http://www.jianshu.com/p/085a5ba2aca8)
 
@@ -20,3 +22,7 @@
 [static の final](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/static%E3%81%AEfinal.md)
 
 ## [线程](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/%E5%AD%90%E7%BA%BF%E7%A8%8B%E3%81%AE%E7%BA%BF%E7%A8%8B%E6%B1%A0.md)
+
+## 基础
+
+[equals 和 ==](https://androidzzt.github.io/2017/03/28/Android-%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87%E4%B9%8B%E3%80%8Cequals-%E5%92%8C-%E3%80%8D/)
