@@ -252,3 +252,5 @@ Observable Collection
 
 ## 相关链接
 [从零开始的Android新项目8 - Data Binding高级篇](http://blog.zhaiyifan.cn/2016/07/06/android-new-project-from-0-p8/)
+
+[DataBinding 学习系列（1）基础知识的了解和使用](http://blog.csdn.net/u011315960/article/details/55211050)
