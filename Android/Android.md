@@ -156,6 +156,7 @@
 ### [65535方法数限制のMultiDex](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Multidex.md)
 ### [多渠道打包](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%A4%9A%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85.md)
 ### [混淆](http://droidyue.com/blog/2016/07/10/understanding-android-obfuscated-code-by-proguard/)
+### [Gradle](http://blog.csdn.net/sdkfjksf/article/details/70254430)
 ### AndroidManifest
 ### 权限管理
 ### adb
