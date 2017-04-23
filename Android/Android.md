@@ -119,6 +119,7 @@
 ### [EventBus](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/EventBus.md)
 ### RxJava
 * <a href="https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/RxJava%E3%81%AEobserveOn()%E4%B8%8EsubscribeOn().md">线程调度</a>
+* [RxJava 2.x 学习](https://xiaobailong24.me/2017/03/18/Android-RxJava2.x/)
 
 ### Dagger2
 * [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/dagger.md)
