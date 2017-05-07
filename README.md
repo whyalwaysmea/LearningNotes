@@ -1,4 +1,9 @@
 # LearningNotes
+This is My Learning Notes.  
+
+Contain Android, Java, Design Pattern, algorithm.  
+
+algorithm is just some concepts. More Algorithm topic can see ..
 
 ### [Android 相关](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android.md)
 
