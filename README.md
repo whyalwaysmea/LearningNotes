@@ -1,16 +1,16 @@
 # LearningNotes
 This is My Learning Notes.  
 
-Contain Android, Java, Design Pattern, algorithm.  
+Contain Android, Java, Computer Network, Design Pattern, Algorithm and Data structure.  
 
-algorithm is just some concepts. More Algorithm topic can see ..
+Algorithm and Data structure is just some concepts. More topic can see ..
 
-### [Android 相关](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android.md)
+### [Android](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android.md)
 
-### [Java 相关](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java.md)
+### [Java](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java.md)
 
-### [计算机网络](https://github.com/whyalwaysmea/LearningNotes/blob/master/http/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md)
+### [Computer Network](https://github.com/whyalwaysmea/LearningNotes/blob/master/http/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md)
 
-### [设计模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/Desing%20pattern.md)
+### [Design Pattern](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/Desing%20pattern.md)
 
-### [算法](https://github.com/whyalwaysmea/LearningNotes/blob/master/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95.md)
+### [Algorithm and Data structure](https://github.com/whyalwaysmea/LearningNotes/blob/master/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95.md)
