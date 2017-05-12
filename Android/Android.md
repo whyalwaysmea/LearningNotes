@@ -194,3 +194,5 @@
 ### [android知识体系结构](http://www.jianshu.com/p/ddb106680129)
 ### [Android思维导图](http://www.jianshu.com/p/9cdeaf62cd92#)
 ### [Android 知识图谱](http://blog.csdn.net/xyz_lmn/article/details/41411355)
+### [Android 开发中的日常积累](https://github.com/lizhangqu/CoreLink)
+### [安卓架构文章合集](https://github.com/CameloeAnthony/AndroidArchitectureCollection)
