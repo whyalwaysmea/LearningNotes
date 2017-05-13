@@ -196,3 +196,6 @@
 ### [Android 知识图谱](http://blog.csdn.net/xyz_lmn/article/details/41411355)
 ### [Android 开发中的日常积累](https://github.com/lizhangqu/CoreLink)
 ### [安卓架构文章合集](https://github.com/CameloeAnthony/AndroidArchitectureCollection)
+### [Android 问题交流讨论坛](https://github.com/android-cn/android-discuss)
+### [android sdk 源码解析](https://github.com/LittleFriendsGroup/AndroidSdkSourceAnalysis)
+### [Android 学习资料收集](https://github.com/Freelander/Android_Data)
