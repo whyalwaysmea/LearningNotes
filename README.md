@@ -3,7 +3,7 @@ This is My Learning Notes.
 
 Contain Android, Java, Computer Network, Design Pattern, Algorithm and Data structure.  
 
-Algorithm and Data structure is just some concepts. More topic can see ..
+Algorithm and Data structure is just some concepts. More topic can see [myLeetCode](https://github.com/whyalwaysmea/myLeetCode)
 
 ### [Android](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android.md)
 
