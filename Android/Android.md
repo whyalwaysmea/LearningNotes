@@ -199,3 +199,11 @@
 ### [Android 问题交流讨论坛](https://github.com/android-cn/android-discuss)
 ### [android sdk 源码解析](https://github.com/LittleFriendsGroup/AndroidSdkSourceAnalysis)
 ### [Android 学习资料收集](https://github.com/Freelander/Android_Data)
+
+
+---
+## 技术周报&博客
+### [Android博客周刊](http://androidblog.cn/)
+### [Android开发技术周报](http://www.androidweekly.cn/)
+### [WeiShu's Notes](http://weishu.me/)
+### [Android 相关博客、资讯以及工具网站索引](https://zhuanlan.zhihu.com/p/27394606?utm_source=com.tencent.tim&utm_medium=social)
