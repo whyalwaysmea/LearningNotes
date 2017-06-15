@@ -189,6 +189,9 @@
 ### [Android 名企面试题及涉及知识点整理](http://www.jianshu.com/p/735be5ece9e8?utm_source=desktop&utm_medium=timeline#)
 
 ---
+## 技术周报
+
+---
 ## 相关链接
 ### [Android开发知识点汇总](http://fvaryu.github.io/2016/07/21/android-learn/)
 ### [android知识体系结构](http://www.jianshu.com/p/ddb106680129)
