@@ -3,7 +3,21 @@
 基于[RxJava2.0.9](https://github.com/ReactiveX/RxJava)
 
 ## [Just](http://reactivex.io/documentation/operators/just.html)
+创建一个发射指定值的Observable  
+![Just](http://reactivex.io/documentation/operators/images/just.c.png)
 
+Just将单个数据转换为发射那个数据的Observable。
+```Java
+Integer[] items = {0, 1, 2, 3, 4, 5};
+Observable.just(items, items)
+        .subscribe(new Consumer<Integer[]>() {
+            @Override
+            public void accept(@NonNull Integer[] integers) throws Exception {
+                Stream.of(integers)
+                        .forEach(integer -> System.out.println(integer));
+            }
+        });
+```
 
 
 ## [From](http://reactivex.io/documentation/operators/from.html)
@@ -32,3 +46,6 @@ ArrayList<String> arrayList = new ArrayList<String>() {
 Observable.fromIterable(arrayList)
         .subscribe(System.out::println);
 ```
+
+## 区别
+Just类似于From，但是From会将数组或Iterable的数据取出然后逐个发射，而Just只是简单的原样发射，将数组或Iterable当做单个数据。
