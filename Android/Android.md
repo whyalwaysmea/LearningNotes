@@ -121,6 +121,7 @@
 ### RxJava
 * <a href="https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/RxJava%E3%81%AEobserveOn()%E4%B8%8EsubscribeOn().md">线程调度</a>
 * [RxJava 2.x 学习](https://xiaobailong24.me/2017/03/18/Android-RxJava2.x/)
+* [Just & From](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/just%20%26%20from.md)
 * [RxCache](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/rxcache.png)
 
 ### Dagger2
