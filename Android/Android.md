@@ -75,7 +75,8 @@
 ## 数据持久化
 ### sharePreference
 ### sqlite
-### 序列化
+### 序列化   
+* [Gson]()
 ### Android文件系统
 ### [Android存储挖坑记](http://blog.desmondyao.com/android-storage/)
 
