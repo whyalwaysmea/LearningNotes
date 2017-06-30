@@ -165,7 +165,7 @@
 ### [Android混淆那些事](http://mp.weixin.qq.com/s/WmJyiA3fDNriw5qXuoA9MA)
 ### [Gradle](http://blog.csdn.net/sdkfjksf/article/details/70254430)
 ### AndroidManifest
-### 权限管理
+### [权限管理](http://www.jianshu.com/p/07e1a1cff5ad)
 ### adb
 
 ---
