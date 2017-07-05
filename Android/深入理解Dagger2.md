@@ -18,9 +18,39 @@ Additionally, a component with a specific scope * cannot have a sub component wi
 并不能保证component只会调用该绑定一次，所以在返回可变对象或者需要使用单例的绑定上使用@Reusable是很危险的。对不关心被分配多少次的不变对象使用@Reusable是安全的。
 
 ## 懒加载注入
-有时你需要延迟初始化对象。对于任意绑定T，你可以创建Lazy<T>，这样就可以延迟对象初始化直到调用Lazy<T>的get()方法。
+有时你需要延迟初始化对象。对于任意绑定T，你可以创建Lazy<T>，这样就可以延迟对象初始化直到调用Lazy<T>的get()方法。  
+```Java
+class GridingCoffeeMaker {
+  @Inject Lazy<Grinder> lazyGrinder;
+
+  public void brew() {
+    while (needsGrinding()) {
+      // Grinder created once on first call to .get() and cached.
+      lazyGrinder.get().grind();
+    }
+  }
+}
+```
 
 ## Provider注入
+有时你需要返回多个实例而不是注入单个值。你有多种选择（Factories,Builders,等等）,其中一种选择就是注入一个Provider<T>而不是T。每次调用get()方法时Provider<T>会调用绑定逻辑。如果那个绑定逻辑是@Inject注解的构造器，会创建一个新对象，但一个@Provides方法是无法保证这点的。  
+```java
+class BigCoffeeMaker {
+  @Inject Provider<Filter> filterProvider;
+
+  public void brew(int numberOfPots) {
+  ...
+    for (int p = 0; p < numberOfPots; p++) {
+      maker.addFilter(filterProvider.get()); //new filter every time.
+      maker.addCoffee(...);
+      maker.percolate();
+      ...
+    }
+  }
+}
+```
+
+##
 
 
 ## 组件
@@ -39,9 +69,80 @@ public interface NetComponent {
     Retrofit retrofit();
 }
 ```
-### 子组件  
+### 组件继承  
+继承关系跟面向对象中的继承的概念有点像，SubComponent 称为子 Component，类似于平常说的子类。下面先看看下面这个场景：  
+```java
+public class Man {
+    @Inject
+    Car car;
+    ...
+}
+
+public class Son {
+    @Inject
+    Car car;
+
+    @Inject
+    Bike bike;
+}
+```  
+Son 可以开他爸爸 Man 的车 car，也可以骑自己的自行车 bike。依赖关系图：  
+![img](http://upload-images.jianshu.io/upload_images/6193835-2547b75874aa3238.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+上图中 SonComponent 在 ManComponent 之中，SonComponent 子承父业，可以访问 parent Component 的依赖，而 ManComponent 只知道 SonComponent 是它的 child Component，可以访问 SubComponent.Builder，却无法访问 SubComponent 中的依赖。  
+
+```java
+@ManScope
+@Component(modules = CarModule.class)
+public interface ManComponent {
+    void inject(Man man);   // 继承关系中不用显式地提供暴露依赖实例的接口
+}
+
+@SonScope
+@SubComponent(modules = BikeModule.class)
+public interface SonComponent {
+    void inject(Son son);
+
+    @Subcomponent.Builder
+    interface Builder { // SubComponent 必须显式地声明 Subcomponent.Builder，parent Component 需要用 Builder 来创建 SubComponent
+        SonComponent build();
+    }
+}
+```
+SubComponent 与 parent Component 的 Scope 不能相同，只是 SubComponent 表明它是继承扩展某 Component 的。    
+怎么表明一个 SubComponent 是属于哪个 parent Component 的呢？只需要在 parent Component 依赖的 Module 中的subcomponents加上 SubComponent 的 class，然后就可以在 parent Component 中请求 SubComponent.Builder。   
+```java
+@Module(subcomponents = SonComponent.class)
+public class CarModule {
+    @Provides
+    @ManScope
+    static Car provideCar() {
+        return new Car();
+    }
+}
+
+@ManScope
+@Component(modules = CarModule.class)
+public interface ManComponent {
+    void injectMan(Man man);
+
+    SonComponent.Builder sonComponent();    // 用来创建 Subcomponent
+}
+```
+SubComponent 编译时不会生成 DaggerXXComponent，需要通过 parent Component 的获取 SubComponent.Builder 方法获取 SubComponent 实例。   
+```java
+ManComponent manComponent = DaggerManComponent().builder()
+    .build();
+
+SonComponent sonComponent = DaggerFriendComponent().builder()
+    .sonComponent()
+    .build();
+sonComponent.inject(son);
+```
+继承关系和依赖关系最大的区别就是：继承关系中不用显式地提供依赖实例的接口，SubComponent 继承 parent Component 的所有依赖。
 
 
 
 ## 相关链接
 [Google官方MVP+Dagger2架构详解【从零开始搭建android框架系列（6）】](http://www.jianshu.com/p/01d3c014b0b1)  
+[Dagger 2 完全解析（三），Component 的组织关系与 SubComponent](http://www.jianshu.com/p/2ac2f39cb25f)
