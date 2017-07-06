@@ -168,6 +168,7 @@
 ### AndroidManifest
 ### [权限管理](http://www.jianshu.com/p/07e1a1cff5ad)
 ### adb
+### [代码规范](http://yifeng.studio/2017/06/30/coding-with-code-style/#more)
 
 ---
 ## 混合编程
