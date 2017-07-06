@@ -141,8 +141,39 @@ sonComponent.inject(son);
 ```
 继承关系和依赖关系最大的区别就是：继承关系中不用显式地提供依赖实例的接口，SubComponent 继承 parent Component 的所有依赖。
 
+另一种继承方式：  
+```java
+@ManScope
+@Component(modules = CarModule.class)
+public interface ManComponent {
+    void injectMan(Man man);
+
+    SonComponent sonComponent();    // 这个抽象工厂方法表明 SonComponent 继承 ManComponent
+}
+```
+
+
+### 继承和依赖的区别    
+相同点：   
+1. 有依赖关系和继承关系的 Component 不能有相同的 Scope  
+2. 两者都能复用其他 Component 的依赖  
+
+区别：  
+1. 依赖关系中被依赖的 Component 必须显式地提供公开依赖实例的接口，而 SubComponent 默认继承 parent Component 的依赖。  
+2. 依赖关系会生成两个独立的 DaggerXXComponent 类，而 SubComponent 不会生成 独立的 DaggerXXComponent 类。    
+
+Component ：  
+你想让两个 Component 都独立，没有任何关联.   
+你想很明确的告诉别人我这个 Component 所依赖的 Component.   
+
+
+Subcomponent ：  
+你想让两个 Component 内聚.   
+你应该并不关心这个 Component 依赖哪个 Component.   
+
 
 
 ## 相关链接
-[Google官方MVP+Dagger2架构详解【从零开始搭建android框架系列（6）】](http://www.jianshu.com/p/01d3c014b0b1)  
-[Dagger 2 完全解析（三），Component 的组织关系与 SubComponent](http://www.jianshu.com/p/2ac2f39cb25f)
+[Google官方MVP+Dagger2架构详解【从零开始搭建android框架系列（6）】](http://www.jianshu.com/p/01d3c014b0b1)   
+[Dagger 2 完全解析（三），Component 的组织关系与 SubComponent](http://www.jianshu.com/p/2ac2f39cb25f)   
+[详解 Dagger2 的 @Scope 和 @Subcomponent](http://www.jianshu.com/p/fbd62868a07b)
