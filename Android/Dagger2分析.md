@@ -1,8 +1,11 @@
-## Q&A
-为什么@scope可以保证作用域内单例？生成的代码是什么样的？    
+## 说明
+本次示例是基于：   
+>compile 'com.google.dagger:dagger:2.11'
+annotationProcessor 'com.google.dagger:dagger-compiler:2.11'   
 
-## 生成代码分析
 
+## 注入代码  
+这里我们先从最基础的注入方式开始：  
 Inject:  
 ```java
 public class Car {
@@ -29,12 +32,21 @@ public class ManActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_man);
-        // DaggerManComponent.builder().build().injectMan(this);
-        DaggerManComponent.create().injectMan(this);
-        System.out.println(mCar.toString());
+        DaggerManComponent.create().inject(this);
+        Log.d("Car", mCar.toString());
+
+        DaggerManComponent.builder().build().inject(this);
+        Log.d("Car", mCar.toString());
     }
 }
-```
+```  
+这里我们先运行起来，看看打印出来的日志：
+>07-08 11:00:32.461 9953-9953/com.whyalwaysmea.dagger2 D/Car: com.whyalwaysmea.dagger2.bean.Car@850a3f9
+07-08 11:00:32.461 9953-9953/com.whyalwaysmea.dagger2 D/Car: com.whyalwaysmea.dagger2.bean.Car@27e1df3e
+
+可以发现，Car的地址变了，说明两次注入是生成的不同的对象。  
+
+## 生成代码分析
 我们这里先从`DaggerManComponent`开始看， `DaggerManComponent`是直接apt生成的代码：  
 ```java
 @Generated(
@@ -137,4 +149,21 @@ public final class ManActivity_MembersInjector implements MembersInjector<ManAct
 }
 ```  
 首先这里是实现了一个`MembersInjector<T>`接口， 里面有一个`injectMembers()`方法，这个方法主要就是返回实例对象的。  
-从这里可以得知，我们注入的时候，是不能用`private`来修饰注入对象的，因为那样的话在生成的代码中是无法获取到对象的。   
+从这里可以得知，我们注入的时候，是不能用`private`来修饰注入对象的，因为那样的话在生成的代码中是无法获取到对象的。  
+
+## 小结   
+通过分析生成的代码，我们知道了三个接口`Factory<T>`和`MembersInjector<T>`，`Factory<T>`又是继承于`Provider<T>`。   
+
+`Factory<T>`可以理解成是生产实例对象的地方：      
+构造方法由`@Inject`修饰过的类XX，会生成一个实现了Factory的类XX_Factory，该类中主要是通过`get()`方法来获取对象。   
+
+`MembersInjector<T>`可以理解成是需要注入对象的成员：  
+在示例中，是ManActivity需要Car,所以这里是生成了`ManActivity_MembersInjector implements MembersInjector<ManActivity>`       
+该类中主要是通过`injectMembers(ManActivity instance)`方法，将Provider<T>.get()获取到的对象赋值给了ManActivity.T   
+
+最后再来小结一下`DaggerXXXComponent`，该类是直接实现了XXXComponent接口的。  
+Component一直被认为是Dagger2中依赖注入的桥梁。这里由于没有涉及到Module，所以Component也没有起到很大的作用。  
+所以也就有了第三种注入的方式：
+```java
+ManActivity_MembersInjector.create(Car_Factory.create()).injectMembers(this);
+```    
