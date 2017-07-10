@@ -8,9 +8,14 @@ annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
 这里我们先从最基础的注入方式开始：  
 Inject:  
 ```java
-public class Car {
+public class Engine {
     @Inject
-    public Car() {}
+    public Engine() {}
+}
+
+public class Car {
+  @Inject
+  public Car(Engine engine) {}
 }
 ```
 
@@ -49,11 +54,9 @@ public class ManActivity extends AppCompatActivity {
 ## 生成代码分析
 我们这里先从`DaggerManComponent`开始看， `DaggerManComponent`是直接apt生成的代码：  
 ```java
-@Generated(
-  value = "dagger.internal.codegen.ComponentProcessor",
-  comments = "https://google.github.io/dagger"
-)
 public final class DaggerManComponent implements ManComponent {
+  private Provider<Car> carProvider;
+
   private MembersInjector<ManActivity> manActivityMembersInjector;
 
   private DaggerManComponent(Builder builder) {
@@ -72,12 +75,14 @@ public final class DaggerManComponent implements ManComponent {
   @SuppressWarnings("unchecked")
   private void initialize(final Builder builder) {
 
-    this.manActivityMembersInjector = ManActivity_MembersInjector.create(Car_Factory.create());
+    this.carProvider = Car_Factory.create(Engine_Factory.create());
+
+    this.manActivityMembersInjector = ManActivity_MembersInjector.create(carProvider);
   }
 
   @Override
-  public void injectMan(ManActivity manActivity) {
-    manActivityMembersInjector.injectMembers(manActivity);
+  public void inject(ManActivity mainActivity) {
+    manActivityMembersInjector.injectMembers(mainActivity);
   }
 
   public static final class Builder {
@@ -94,25 +99,41 @@ public final class DaggerManComponent implements ManComponent {
 所以我们这里先看看initialize：  
 ```java
 private void initialize(final Builder builder) {
-    this.manActivityMembersInjector = ManActivity_MembersInjector.create(Car_Factory.create());
+  this.carProvider = Car_Factory.create(Engine_Factory.create());
+
+  this.manActivityMembersInjector = ManActivity_MembersInjector.create(carProvider);
 }
 ```   
-这里又涉及到了，其他两个由apt生成的java类，分别是`ManActivity_MembersInjector`和`Car_Factory`   
+这里又涉及到了，其他三个由apt生成的java类，分别是`ManActivity_MembersInjector`和`Car_Factory`， `Engine_Factory`       
 ```java
-@Generated(
-  value = "dagger.internal.codegen.ComponentProcessor",
-  comments = "https://google.github.io/dagger"
-)
+public final class Engine_Factory implements Factory<Engine> {
+  private static final Engine_Factory INSTANCE = new Engine_Factory();
+
+  @Override
+  public Engine get() {
+    return new Engine();
+  }
+
+  public static Factory<Engine> create() {
+    return INSTANCE;
+  }
+}
+
 public final class Car_Factory implements Factory<Car> {
-  private static final Car_Factory INSTANCE = new Car_Factory();
+  private final Provider<Engine> engineProvider;
+
+  public Car_Factory(Provider<Engine> engineProvider) {
+    assert engineProvider != null;
+    this.engineProvider = engineProvider;
+  }
 
   @Override
   public Car get() {
-    return new Car();
+    return new Car(engineProvider.get());
   }
 
-  public static Factory<Car> create() {
-    return INSTANCE;
+  public static Factory<Car> create(Provider<Engine> engineProvider) {
+    return new Car_Factory(engineProvider);
   }
 }
 ```    
@@ -167,3 +188,67 @@ Component一直被认为是Dagger2中依赖注入的桥梁。这里由于没有�
 ```java
 ManActivity_MembersInjector.create(Car_Factory.create()).injectMembers(this);
 ```    
+
+-----
+## 前言  
+之前介绍了最简单的注入生成代码，使用的注入方式是使用`@Inject`， 今天我们解析另外一种注入方式。   
+
+
+## Module  
+使用@Inject标注构造函数来提供依赖的对象实例的方法，不是万能的，在以下几种场景中无法使用：  
+1. 第三方库的类不能被标注  
+2. 构造函数中的参数必须配置   
+3. 抽象的类  
+
+所以这里我们先简单的使用Module：
+```java
+@Module
+public class CarModule {
+    @Provides
+    Car carProvide(Engine engine) {
+        return new Car(engine);
+    }
+}
+```
+当然Component也需要跟着做一些调整：  
+```java
+@Component(modules = CarModule.class)
+public interface ManComponent {
+    void inject(ManActivity mainActivity);
+}
+```  
+接着我们来分析生成的代码，这里最大的不同就是XXModule中有几个@Provides，就会生成几个对应的类：XXModule_ProvideYYFactory   
+因为这里我们只有一个@Provides，所以就生成了一个CarModule_ProvideCarFactory：   
+```java
+public final class CarModule_CarProvideFactory implements Factory<Car> {
+  private final CarModule module;
+
+  private final Provider<Engine> engineProvider;
+
+  public CarModule_CarProvideFactory(CarModule module, Provider<Engine> engineProvider) {
+    assert module != null;
+    this.module = module;
+    assert engineProvider != null;
+    this.engineProvider = engineProvider;
+  }
+
+  @Override
+  public Car get() {
+    return Preconditions.checkNotNull(
+        module.carProvide(engineProvider.get()),
+        "Cannot return null from a non-@Nullable @Provides method");
+  }
+
+  public static Factory<Car> create(CarModule module, Provider<Engine> engineProvider) {
+    return new CarModule_CarProvideFactory(module, engineProvider);
+  }
+
+  /** Proxies {@link CarModule#carProvide(Engine)}. */
+  public static Car proxyCarProvide(CarModule instance, Engine engine) {
+    return instance.carProvide(engine);
+  }
+}
+```  
+同样这个类也是实现了`Factory<T>`接口，不同于上一节的Car_Factory，这个类中多了一个构造方法和一个`proxyProvideCar`方法，同时`get`方法的实现也有了一点不一样。    
+原来的`get()`是直接调用了构造函数来返回实例的，而现在是通过module.carProvide来获取的实例， 这正是@Proxies起的作用。   
+`proxyCarProvide`所起的作用和`get`的作用一样。    
