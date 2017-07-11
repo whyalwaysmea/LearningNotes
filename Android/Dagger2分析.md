@@ -260,4 +260,135 @@ public final class CarModule_CarProvideFactory implements Factory<Car> {
 -----
 
 ## @Scope   
-Scope 是用来确定注入的实例的生命周期的，如果没有使用 Scope 注解，Component 每次调用 Module 中的 provide 方法或 Inject 构造函数生成的工厂时都会创建一个新的实例，而使用 Scope 后可以复用之前的依赖实例。    
+>When a binding uses a scope annotation, that means that the component object holds a reference to the bound object until the component object itself is garbage-collected.  
+
+当 Component 与 Module、目标类（需要被注入依赖）使用 Scope 注解绑定时，意味着 Component 对象持有绑定的依赖实例的一个引用直到 Component 对象本身被回收。  
+也就是作用域的原理，其实是让生成的依赖实例的生命周期与 Component 绑定，Scope 注解并不能保证生命周期，要想保证赖实例的生命周期，需要确保 Component 的生命周期。   
+
+Scope 是用来确定注入的实例的生命周期的，如果没有使用 Scope 注解，Component 每次调用 Module 中的 provide 方法或 Inject 构造函数生成的工厂时都会创建一个新的实例，而使用 Scope 后可以复用之前的依赖实例。      
+
+Scope 注解只能标注目标类、@provide 方法和 Component。  
+Scope 注解要生效的话，需要同时标注在 Component 和提供依赖实例的 Module 或目标类上。  
+Module 中 provide 方法中的 Scope 注解必须和 与之绑定的 Component 的 Scope 注解一样，否则作用域不同会导致编译时会报错。    
+
+## @Singleton   
+@Singleton顾名思义保证单例，那么它又是如何实现的呢，实现了单例模式那样只返回一个实例吗？   
+我们先看看怎么使用：
+```java
+@Singleton
+public class Engine {
+    @Inject
+    public Engine() {}
+}
+
+public class Car {
+    public Engine mEngine;
+    public Car(Engine engine) {
+        this.mEngine = engine;
+    }
+
+    public Engine getEngine() {
+        return mEngine;
+    }
+}
+```
+```java
+@Module
+public class CarModule {
+    @Provides
+    @Singleton
+    Car carProvide(Engine engine) {
+        return new Car(engine);
+    }
+}
+```
+```java
+@Component(modules = CarModule.class)
+@Singleton
+public interface ManComponent {
+    void inject(ManActivity mainActivity);
+}
+```
+```java
+public class ManActivity extends AppCompatActivity {
+
+    @Inject
+    Car mCar;
+
+    @Inject
+    Car mCar2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        DaggerManComponent.create().inject(this);
+        Log.d("Car", mCar.toString());
+        Log.d("Car", mCar2.toString());
+    }
+}
+```  
+最后我们观察日志：
+>07-11 11:20:47.788 31539-31539/com.whyalwaysmea.dagger2 D/Car: com.whyalwaysmea.dagger2.bean.Car@eda5747
+07-11 11:20:47.789 31539-31539/com.whyalwaysmea.dagger2 D/Car: com.whyalwaysmea.dagger2.bean.Car@eda5747   
+
+可以发现这两个变量其实是同一个。     
+对比生成的代码，最大的不一样是`DaggerManComponent`，其他几个类都几乎没有什么变化。   
+```java
+public final class DaggerManComponent implements ManComponent {
+  ...
+
+  @SuppressWarnings("unchecked")
+  private void initialize(final Builder builder) {
+    //
+    this.engineProvider = DoubleCheck.provider(Engine_Factory.create());
+
+    this.carProvideProvider =
+        DoubleCheck.provider(CarModule_CarProvideFactory.create(builder.carModule, engineProvider));
+
+    this.manActivityMembersInjector = ManActivity_MembersInjector.create(carProvideProvider);
+  }
+
+  ...
+}
+```   
+可以看到这里最大的不同就是多了一个`DoubleCheck.provider`
+```java
+public final class DoubleCheck<T> implements Provider<T>, Lazy<T> {
+  private static final Object UNINITIALIZED = new Object();
+  private volatile Provider<T> provider;
+  private volatile Object instance = UNINITIALIZED; // instance 就是依赖实例的引用
+  ...
+  @SuppressWarnings("unchecked") // cast only happens when result comes from the provider
+  @Override
+  public T get() {
+    Object result = instance;
+    if (result == UNINITIALIZED) {  // 只生成一次实例，之后调用的话直接复用
+      synchronized (this) {
+        result = instance;
+        if (result == UNINITIALIZED) {
+          result = provider.get();  // 生成实例
+          /* Get the current instance and test to see if the call to provider.get() has resulted
+           * in a recursive call.  If it returns the same instance, we'll allow it, but if the
+           * instances differ, throw. */
+          Object currentInstance = instance;
+          if (currentInstance != UNINITIALIZED && currentInstance != result) {
+            throw new IllegalStateException("Scoped provider was invoked recursively returning "
+                + "different results: " + currentInstance + " & " + result + ". This is likely "
+                + "due to a circular dependency.");
+          }
+          instance = result;
+          /* Null out the reference to the provider. We are never going to need it again, so we
+           * can make it eligible for GC. */
+          provider = null;
+        }
+      }
+    }
+    return (T) result;
+  }
+  ...
+}
+```  
+可以看到`DoubleCheck<T>`实现了`Factory<T>`和`Lazy<T>`，主要的逻辑还是在`get()`方法中。  
+内部方法中有点像[Double CheckLock实现单例](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F.md#double-checklock实现单例)的方法，只是每次都会有一个新的局部变量，而真正的单例方法是使用的static。    
