@@ -252,3 +252,12 @@ public final class CarModule_CarProvideFactory implements Factory<Car> {
 同样这个类也是实现了`Factory<T>`接口，不同于上一节的Car_Factory，这个类中多了一个构造方法和一个`proxyProvideCar`方法，同时`get`方法的实现也有了一点不一样。    
 原来的`get()`是直接调用了构造函数来返回实例的，而现在是通过module.carProvide来获取的实例， 这正是@Proxies起的作用。   
 `proxyCarProvide`所起的作用和`get`的作用一样。    
+
+## 小结
+在使用@Module的时候，里面会有对应的@Providers来提供需要生成的对象。   
+每一个@Provides，都会生成对应的XXModule_ProvideYYFactory， 该类就类似于最基础的Factory<T>，用于提供实例。  
+
+-----
+
+## @Scope   
+Scope 是用来确定注入的实例的生命周期的，如果没有使用 Scope 注解，Component 每次调用 Module 中的 provide 方法或 Inject 构造函数生成的工厂时都会创建一个新的实例，而使用 Scope 后可以复用之前的依赖实例。    
