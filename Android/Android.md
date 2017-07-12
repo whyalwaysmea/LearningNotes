@@ -156,6 +156,7 @@
 ### 热更新
 ### 增量更新
 ### 组件化
+### [插件化](http://www.androidblog.cn/index.php/Index/detail/id/16?from=groupmessage)
 
 ---
 ## 项目构建
