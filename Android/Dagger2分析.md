@@ -1,6 +1,6 @@
 ## 说明
 本次示例是基于：   
->compile 'com.google.dagger:dagger:2.11'
+>compile 'com.google.dagger:dagger:2.11'    
 annotationProcessor 'com.google.dagger:dagger-compiler:2.11'   
 
 
@@ -253,6 +253,14 @@ public final class CarModule_CarProvideFactory implements Factory<Car> {
 原来的`get()`是直接调用了构造函数来返回实例的，而现在是通过module.carProvide来获取的实例， 这正是@Proxies起的作用。   
 `proxyCarProvide`所起的作用和`get`的作用一样。    
 
+还有一种比较特殊的情况，就是我们自己重载了XXModule的构造方法，给它加上了几个参数。
+这时会发现，DaggerXXXComponent中就没有了`create()`方法。 这是因为`Builder`类中，已经无法自己构造出XXModule了，需要通过外部传入XXModule。  
+所以在这种情况下，就只有使用
+```java
+DaggerXXXComponent.builder().XXModule(new XXModule()).build().inject();
+```
+需要注意的是，如果这里的注入涉及到了某个Module，同时该Module的构造方法是需要参数的，那么就必须传入。  
+
 ## 小结
 在使用@Module的时候，里面会有对应的@Providers来提供需要生成的对象。   
 每一个@Provides，都会生成对应的XXModule_ProvideYYFactory， 该类就类似于最基础的Factory<T>，用于提供实例。  
@@ -392,3 +400,6 @@ public final class DoubleCheck<T> implements Provider<T>, Lazy<T> {
 ```  
 可以看到`DoubleCheck<T>`实现了`Factory<T>`和`Lazy<T>`，主要的逻辑还是在`get()`方法中。  
 内部方法中有点像[Double CheckLock实现单例](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F.md#double-checklock实现单例)的方法，只是每次都会有一个新的局部变量，而真正的单例方法是使用的static。    
+
+由于DoubleCheck是在DaggerXXXComponent中调用的，然而DaggerXXXComponent又是我们通过它的Builder方法来获取的。   
+所以 Singleton 作用域可以保证一个 Component 中的单例，但是如果产生多个 Component 实例，那么实例的单例就无法保证了。   
