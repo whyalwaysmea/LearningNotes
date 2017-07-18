@@ -5,7 +5,17 @@
 * Activity生命周期的管理
 * ClassLoader的管理  
 
-在此之前我们要明白宿主和插件。宿主是指普通的apk，而插件一般是指经过处理的dex或者apk。
+在此之前我们要明白宿主和插件。宿主是指普通的apk，而插件一般是指经过处理的dex或者apk。   
+
+
+## 基础知识  
+### [Java中的ClassLoader](https://www.ibm.com/developerworks/cn/java/j-lo-classloader/)  
+ ClassLoader 中与加载类相关的方法:   
+
+
+### Android中的ClassLoader   
+
+
 
 ### 资源访问
 因为宿主程序中并没有插件的资源，所以通过R来加载插件的资源是行不通的，程序会抛出异常：无法找到某某id所对应的资源。
