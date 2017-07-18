@@ -10,10 +10,110 @@
 
 ## 基础知识  
 ### [Java中的ClassLoader](https://www.ibm.com/developerworks/cn/java/j-lo-classloader/)  
- ClassLoader 中与加载类相关的方法:   
+#### ClassLoader 中与加载类相关的方法:   
+
+ 方法 | 说明 |
+ ----|------|
+ getParent() | 返回该类加载器的父类加载器
+loadClass(String name) | 加载名称为 name的类，返回的结果是 java.lang.Class类的实例。
+findClass(String name) | 查找名称为 name的类，返回的结果是 java.lang.Class类的实例。  
+findLoadedClass(String name) | 查找名称为 name的已经被加载过的类，返回的结果是 java.lang.Class类的实例。  
+defineClass(String name, byte[] b, int off, int len) | 把字节数组 b中的内容转换成 Java 类，返回的结果是 java.lang.Class类的实例。这个方法被声明为 final的。
+resolveClass(Class<?> c) | 链接指定的 Java 类。   
+
+#### 类加载器的树状组织结构  
+Java 中的类加载器大致可以分成两类，一类是系统提供的，另外一类则是由 Java 应用开发人员编写的。系统提供的类加载器主要有下面三个：   
+- 引导类加载器（bootstrap class loader）：它用来加载 Java 的核心库，是用原生代码来实现的，并不继承自 java.lang.ClassLoader。  
+- 扩展类加载器（extensions class loader）：它用来加载 Java 的扩展库。Java 虚拟机的实现会提供一个扩展库目录。该类加载器在此目录里面查找并加载 Java 类。  
+- 系统类加载器（system class loader）：也称为应用类加载器，它的父加载器为扩展类加载器。它从环境变量classpath或者系统属性java.class.path所指定的目录中加载类，它是用户自定义的类加载器的默认父加载器。系统类加载器是纯Java类，是java.lang.ClassLoader类的子类。  
+
+父子加载器并非继承关系，也就是说子加载器不一定是继承了父加载器。
+
+![类加载器树状组织结构示意图](https://www.ibm.com/developerworks/cn/java/j-lo-classloader/image001.jpg)
+
+#### 双亲委托模式
+通俗的讲，就是某个特定的类加载器在接到加载类的请求时，首先将加载任务委托给父类加载器，依次递归，如果父类加载器可以完成类加载任务，就成功返回；只有父类加载器无法完成此加载任务时，才自己去加载。   
+1. 因为这样可以避免重复加载，当父亲已经加载了该类的时候，就没有必要子ClassLoader再加载一次。   
+2. 考虑到安全因素，我们试想一下，如果不使用这种委托模式，那我们就可以随时使用自定义的String来动态替代java核心api中定义类型，这样会存在非常大的安全隐患，而双亲委托的方式，就可以避免这种情况，因为String已经在启动时被加载，所以用户自定义类是无法加载一个自定义的ClassLoader。  
 
 
-### Android中的ClassLoader   
+### [Android中的ClassLoader](http://blog.csdn.net/u012124438/article/details/53235848)   
+JVM中ClassLoader通过defineClass方法加载jar里面的Class，而Android中这个方法被弃用了。  
+```java
+@Deprecated
+protected final Class<?> defineClass(byte[] b, int off, int len)
+    throws ClassFormatError {
+    throw new UnsupportedOperationException("can't load this type of class file");
+}
+```  
+取而代之的是loadClass方法
+```java
+protected Class<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException {
+        // First, check if the class has already been loaded
+        Class c = findLoadedClass(name);
+        if (c == null) {
+            long t0 = System.nanoTime();
+            try {
+                if (parent != null) {
+                    c = parent.loadClass(name, false);
+                } else {
+                    c = findBootstrapClassOrNull(name);
+                }
+            } catch (ClassNotFoundException e) {
+                // ClassNotFoundException thrown if class not found
+                // from the non-null parent class loader
+            }
+
+            if (c == null) {
+                // If still not found, then invoke findClass in order
+                // to find the class.
+                long t1 = System.nanoTime();
+                c = findClass(name);
+
+                // this is the defining class loader; record the stats
+            }
+        }
+        return c;
+}
+```
+#### DexClassLoader与PathClassLoader   
+```java
+class DexClassLoader extends BaseDexClassLoader {
+    public DexClassLoader(String dexPath, String optimizedDirectory, String libraryPath, ClassLoader parent) {
+        super(dexPath, new File(optimizedDirectory), libraryPath, parent);
+    }
+}
+```
+```java
+class PathClassLoader extends BaseDexClassLoader {
+    public PathClassLoader(String dexPath, ClassLoader parent) {
+        super(dexPath, null, null, parent);
+    }
+
+    public PathClassLoader(String dexPath, String libraryPath, ClassLoader parent) {
+        super(dexPath, null, libraryPath, parent);
+    }
+}
+```
+这两者只是简单的对BaseDexClassLoader做了一下封装，具体的实现还是在父类里。   
+但是两者还是有区别的，PathClassLoader的optimizedDirectory只能是null     
+optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。   
+DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory；而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。   
+
+
+### 加载类的过程   
+java.lang.Object    
+   ↳	java.lang.ClassLoader   
+ 	   ↳	dalvik.system.BaseDexClassLoader   
+ 	 	   ↳	dalvik.system.DexClassLoader / dalvik.system.PathClassLoader     
+
+1. Android中，ClassLoader用loadClass方法来加载我们需要的类  
+2. loadClass方法调用了findClass方法，而BaseDexClassLoader重载了这个方法   
+3. 结果还是调用了DexPathList的findClass       
+4. 最后调用了Native方法defineClass加载类   
+
+ 
 
 
 
