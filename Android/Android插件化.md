@@ -99,8 +99,14 @@ class PathClassLoader extends BaseDexClassLoader {
 这两者只是简单的对BaseDexClassLoader做了一下封装，具体的实现还是在父类里。   
 但是两者还是有区别的，PathClassLoader的optimizedDirectory只能是null     
 optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。   
-DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory；而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。   
+DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory；而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。     
 
+1) DexClassLoader：可以加载jar/apk/dex，可以从SD卡中加载未安装的apk；
+2) PathClassLoader：要传入系统中apk的存放Path，所以只能加载已经安装的apk文件；
+
+**参考链接：**    
+[深入探讨 Java 类加载器](https://www.ibm.com/developerworks/cn/java/j-lo-classloader/)    
+[Android插件化学习之路（二）之ClassLoader完全解析](http://blog.csdn.net/u012124438/article/details/53235848)
 
 ### 加载类的过程   
 java.lang.Object    
@@ -113,8 +119,20 @@ java.lang.Object
 3. 结果还是调用了DexPathList的findClass       
 4. 最后调用了Native方法defineClass加载类   
 
- 
 
+### 调用.dex中的代码  
+Java程序中，JVM虚拟机是通过类加载器ClassLoader加载.jar文件里面的类的。Android也类似，不过android用的是Dalvik/ART虚拟机，不是JVM，也不能直接加载.jar文件，而是加载dex文件。  
+
+先要通过Android SDK提供的DX工具把.jar文件优化成.dex文件，然后Android的虚拟机才能加载。注意，有的Android应用能直接加载.jar文件，那是因为这个.jar文件已经经过优化，只不过后缀名没改（其实已经是.dex文件）。   
+
+
+调用普通的逻辑代码可以通过下面两种方式：   
+1. 使用DexClassLoader加载进来的类，我们本地并没有这些类的源码，所以无法直接调用，不过可以通过反射的方法调用。  
+2. 毕竟.dex文件也是我们自己维护的，所以可以把方法抽象成公共接口，把这些接口也复制到主项目里面去，就可以通过这些接口调用动态加载得到的实例的方法了。
+
+**参考链接：**   
+[Android动态加载dex技术初探](http://blog.csdn.net/u013478336/article/details/50734108)   
+[Android插件化学习之路（三）之调用外部.dex文件中的代码](http://blog.csdn.net/u012124438/article/details/53236472)  
 
 
 ### 资源访问
