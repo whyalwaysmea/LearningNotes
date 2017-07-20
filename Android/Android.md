@@ -73,7 +73,7 @@
 
 ----
 ## 数据持久化
-### sharePreference
+### [sharePreference](http://gityuan.com/2017/06/18/SharedPreferences/?utm_source=androidweekly.cn&utm_medium=website)
 ### sqlite
 ### 序列化   
 * [Gson]()
