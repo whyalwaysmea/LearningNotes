@@ -57,8 +57,8 @@
 ----
 ## 资源相关
 ### [资源文件相关](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E7%9B%B8%E5%85%B3.md)
-### [Drawable](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Drawable.md)
-### 换肤/夜间模式
+### [Drawable](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Drawable.md)   
+### [换肤/夜间模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E6%8D%A2%E8%82%A4.md)  
 
 
 -----
