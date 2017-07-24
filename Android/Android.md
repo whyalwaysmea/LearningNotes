@@ -152,7 +152,6 @@
 
 ---
 ## 进阶
-### Android的动态加载技术
 ### 热更新
 ### 增量更新
 ### 组件化
@@ -171,6 +170,7 @@
 ### [权限管理](http://www.jianshu.com/p/07e1a1cff5ad)
 ### adb
 ### [代码规范](http://yifeng.studio/2017/06/30/coding-with-code-style/#more)
+### [Android构建过程分析](https://mp.weixin.qq.com/s?__biz=MzI1NjEwMTM4OA==&mid=2651232113&idx=1&sn=02f413999ab0865e23d272e69b9e6196&mpshare=1&scene=23&srcid=0315CebrlAZBqtswOGnbcy5F%23rd)    
 
 ---
 ## 混合编程
