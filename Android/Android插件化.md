@@ -80,6 +80,10 @@ protected Class<?> loadClass(String name, boolean resolve)
 #### DexClassLoader与PathClassLoader   
 ```java
 class DexClassLoader extends BaseDexClassLoader {
+    // dexPath:包含dex文件的路径，如apk或者包含dex文件的jar包    
+    // optimizedDirectory：这个是从apk中释放出的dex文件的保存路径  
+    // librarySearchPath：顾名思义lib搜素路径，一般为null   
+    // parent：父加载器  
     public DexClassLoader(String dexPath, String optimizedDirectory, String libraryPath, ClassLoader parent) {
         super(dexPath, new File(optimizedDirectory), libraryPath, parent);
     }
@@ -135,5 +139,45 @@ Java程序中，JVM虚拟机是通过类加载器ClassLoader加载.jar文件里�
 [Android插件化学习之路（三）之调用外部.dex文件中的代码](http://blog.csdn.net/u012124438/article/details/53236472)  
 
 
-### 资源访问
-因为宿主程序中并没有插件的资源，所以通过R来加载插件的资源是行不通的，程序会抛出异常：无法找到某某id所对应的资源。
+### 资源访问   
+res里的每一个资源都会在R.Java里生成一个对应的Integer类型的id，APP启动时会先把R.java注册到当前的上下文环境，我们在代码里以R文件的方式使用资源时正是通过使用这些id访问res资源，然而插件的R.java并没有注册到当前的上下文环境，所以插件的res资源也就无法通过id使用了。   
+
+平时我们所访问资源一般是通过`getResources().getXXX()`的方式来获取的。  
+因为宿主程序中并没有插件的资源，所以通过R来加载插件的资源是行不通的，程序会抛出异常：无法找到某某id所对应的资源。     
+所以我们需要先获取到插件的Resources:   
+```java
+private Resources getPlugResources() {
+    // 获取插件包中的资源
+    AssetManager assetManager = null;
+    try {
+        assetManager = AssetManager.class.newInstance();
+        Method addAssetPath = assetManager.getClass().getMethod("addAssetPath", String.class);
+        addAssetPath.invoke(assetManager, mDexPath);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    if (assetManager == null) {
+        return null;
+    }
+    Resources superRes = super.getResources();
+    mPlugResources = new Resources(assetManager, superRes.getDisplayMetrics(),
+            superRes.getConfiguration());
+
+    return mPlugResources;
+}
+
+public int getColor(String colorName) {
+    if (mPlugResources == null) {
+        getPlugResources();
+    }
+    try {
+        return mPlugResources.getColor(mPlugResources.getIdentifier(colorName, COLOR, PLUG_NAME));
+
+    } catch (Resources.NotFoundException e) {
+        e.printStackTrace();
+        return -1;
+    }
+}
+```    
+
+[插件化知识梳理(9) - 资源的动态加载示例及源码分析](http://www.jianshu.com/p/86dbf0360348)  
