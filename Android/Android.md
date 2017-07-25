@@ -170,7 +170,7 @@
 ### [权限管理](http://www.jianshu.com/p/07e1a1cff5ad)
 ### adb
 ### [代码规范](http://yifeng.studio/2017/06/30/coding-with-code-style/#more)
-### [Android构建过程分析](https://mp.weixin.qq.com/s?__biz=MzI1NjEwMTM4OA==&mid=2651232113&idx=1&sn=02f413999ab0865e23d272e69b9e6196&mpshare=1&scene=23&srcid=0315CebrlAZBqtswOGnbcy5F%23rd)    
+### [Android打包构建过程分析](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E6%89%93%E5%8C%85%E6%9E%84%E5%BB%BA.md)    
 
 ---
 ## 混合编程
