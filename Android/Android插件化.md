@@ -110,7 +110,8 @@ DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外
 
 **参考链接：**    
 [深入探讨 Java 类加载器](https://www.ibm.com/developerworks/cn/java/j-lo-classloader/)    
-[Android插件化学习之路（二）之ClassLoader完全解析](http://blog.csdn.net/u012124438/article/details/53235848)
+[Android插件化学习之路（二）之ClassLoader完全解析](http://blog.csdn.net/u012124438/article/details/53235848)  
+[Android插件化框架系列之类加载器](http://www.jianshu.com/p/57fc356b9093)   
 
 ### 加载类的过程   
 java.lang.Object    
@@ -180,4 +181,10 @@ public int getColor(String colorName) {
 }
 ```    
 
-[插件化知识梳理(9) - 资源的动态加载示例及源码分析](http://www.jianshu.com/p/86dbf0360348)  
+[插件化知识梳理(9) - 资源的动态加载示例及源码分析](http://www.jianshu.com/p/86dbf0360348)    
+
+###  动态加载Activity  
+
+
+[8个类搞定插件化——Activity实现方案](https://kymjs.com/code/2016/05/15/01/)   
+[Android插件化框架之动态加载Activity](http://www.jianshu.com/p/1035ffd9e9cf)   
