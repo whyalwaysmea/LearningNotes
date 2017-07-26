@@ -184,7 +184,29 @@ public int getColor(String colorName) {
 [插件化知识梳理(9) - 资源的动态加载示例及源码分析](http://www.jianshu.com/p/86dbf0360348)    
 
 ###  动态加载Activity  
+apk被宿主程序调起以后，apk中的activity其实就是一个普通的对象，不具有activity的性质，因为系统启动activity是要做很多初始化工作的，而我们在应用层通过反射去启动activity是很难完成系统所做的初始化工作的，所以activity的大部分特性都无法使用包括activity的生命周期管理，这就需要我们自己去管理。当然还需要我们常说的上下文Context   
+  
+
+#### 绑定Context
+需要先简单的了解一下Activity的[启动流程](http://www.jianshu.com/p/1035ffd9e9cf)。  
+在此就直接记录重要的结论：  
+>在`ActivityThread.java`的`performLaunchActivity`方法中，该方法通过Instrumentation的newActivity创建了activity类，接着完成了application的创建（没有创建Application的情况下，在该方法中就创建了Application的context），接着通过createBaseContextForActivity方法为该activity创建context，再调用attach方法进行绑定。  
+
+正常的的Activity被AMS反射调用，在attach后就有了Context，那我们自己反射的Activity要想有Context，就要模拟AMS调用方式，构造Context，但是这相当于再写个系统，不可实现，那怎么办？
+
+遇到问题，解决问题。   
+插件中被反射的activity没有了Context，我们可以把主apk的Acitvity的Context传递给插件Acitivity。  
+在宿主APK注册一个ProxyActivity（代理Activity），就是作为占坑使用。每次打开插件APK里的某一个Activity的时候，都是在宿主里使用启动ProxyActivity，然后在ProxyActivity的生命周期里方法中，调用插件中的Activity实例的生命周期方法，从而执行插件APK的业务逻辑。所以思路就来了：  
+第一、ProxyActivity中需要保存一个Activity实例，该实例记录着当前需要调用插件中哪个Activity的生命周期方法。   
+第二、ProxyActivity如何调用插件apk中Activity的所有生命周期的方法,使用反射呢？还是其他方式（接口）。  
 
 
+
+
+HOOK：   
 [8个类搞定插件化——Activity实现方案](https://kymjs.com/code/2016/05/15/01/)   
-[Android插件化框架之动态加载Activity](http://www.jianshu.com/p/1035ffd9e9cf)   
+
+动态代理：  
+[dynamic-load-apk](https://github.com/singwhatiwanna/dynamic-load-apk)   
+[知识总结 插件化学习 Activity加载分析](http://www.jianshu.com/p/127ecc0c7567)   
+[Android插件化系列第（五）篇---Activity的插件化方案（代理模式）](http://www.jianshu.com/p/7b2cc534d097)  
