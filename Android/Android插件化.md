@@ -183,11 +183,11 @@ public int getColor(String colorName) {
 
 [插件化知识梳理(9) - 资源的动态加载示例及源码分析](http://www.jianshu.com/p/86dbf0360348)    
 
-###  动态加载Activity  
+###  调用插件中的Activity    
 apk被宿主程序调起以后，apk中的activity其实就是一个普通的对象，不具有activity的性质，因为系统启动activity是要做很多初始化工作的，而我们在应用层通过反射去启动activity是很难完成系统所做的初始化工作的，所以activity的大部分特性都无法使用包括activity的生命周期管理，这就需要我们自己去管理。当然还需要我们常说的上下文Context   
-  
 
-#### 绑定Context
+
+#### 代理Activity
 需要先简单的了解一下Activity的[启动流程](http://www.jianshu.com/p/1035ffd9e9cf)。  
 在此就直接记录重要的结论：  
 >在`ActivityThread.java`的`performLaunchActivity`方法中，该方法通过Instrumentation的newActivity创建了activity类，接着完成了application的创建（没有创建Application的情况下，在该方法中就创建了Application的context），接着通过createBaseContextForActivity方法为该activity创建context，再调用attach方法进行绑定。  
@@ -200,13 +200,60 @@ apk被宿主程序调起以后，apk中的activity其实就是一个普通的对
 第一、ProxyActivity中需要保存一个Activity实例，该实例记录着当前需要调用插件中哪个Activity的生命周期方法。   
 第二、ProxyActivity如何调用插件apk中Activity的所有生命周期的方法,使用反射呢？还是其他方式（接口）。  
 
+缺点：  
+1. 插件Activity不能使用this关键字，比如this.finish()方法是无效的，真正掌管生命周期的是proxy应该调用proxy.finish()，所以百度开源框架 dynamic-load-apk使用that指向proxy，约定插件中使用that来代替this。  
+2. 插件Activity无法深度演绎真正的Activity组件，可能有些高级特性无法使用。  
+3. 启动新activity的约束：启动外部activity不受限制，启动apk内部的activity有限制，首先由于apk中的activity没注册，所以不支持隐式调用，其次必须通过BaseActivity中定义的新方法startActivityByProxy和startActivityForResultByProxy，还有就是不支持LaunchMode。
 
 
+#### 占坑Activity  
+在了解了Activity的启动流程之后，我们得知是`mInstrumentation.newActivity()`创建的Activity。   
+我们要做的就是通过替换掉Instrumentation类，达到定制插件运行环境的目的。  
+
+1. 替换Instrumentation类  
+```java
+// 先获取到当前的ActivityThread对象
+Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
+Method currentActivityThreadMethod = activityThreadClass.getDeclaredMethod("currentActivityThread");
+currentActivityThreadMethod.setAccessible(true);
+Object currentActivityThread = currentActivityThreadMethod.invoke(null);
+
+// 拿到原始的 mInstrumentation字段
+Field mInstrumentationField = activityThreadClass.getDeclaredField("mInstrumentation");
+mInstrumentationField.setAccessible(true);
+Instrumentation mInstrumentation = (Instrumentation) mInstrumentationField.get(currentActivityThread);
+
+//如果没有注入过，就执行替换
+if (!(mInstrumentation instanceof PluginInstrumentation)) {
+    PluginInstrumentation pluginInstrumentation = new PluginInstrumentation(mInstrumentation);
+    mInstrumentationField.set(currentActivityThread, pluginInstrumentation);
+}
+```
+
+2. 替换newActivity()  
+```java
+@Override
+public Activity newActivity(ClassLoader cl, String className, Intent intent)
+        throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    if (intent != null) {
+        isPlugin = intent.getBooleanExtra(PluginCons.FLAG_ACTIVITY_FROM_PLUGIN, false);
+    }
+    if (isPlugin && intent != null) {
+        className = intent.getStringExtra(PluginCons.FLAG_ACTIVITY_CLASS_NAME);
+    }
+    return super.newActivity(cl, className, intent);
+}
+```
 
 HOOK：   
 [8个类搞定插件化——Activity实现方案](https://kymjs.com/code/2016/05/15/01/)   
+[Android 插件化原理解析——Activity生命周期管理](http://weishu.me/2016/03/21/understand-plugin-framework-activity-management/)  
 
 动态代理：  
 [dynamic-load-apk](https://github.com/singwhatiwanna/dynamic-load-apk)   
 [知识总结 插件化学习 Activity加载分析](http://www.jianshu.com/p/127ecc0c7567)   
-[Android插件化系列第（五）篇---Activity的插件化方案（代理模式）](http://www.jianshu.com/p/7b2cc534d097)  
+[Android插件化系列第（五）篇---Activity的插件化方案（代理模式）](http://www.jianshu.com/p/7b2cc534d097)    
+
+
+## 总结
+[Android动态加载技术 系列索引](https://segmentfault.com/a/1190000004086213)  
