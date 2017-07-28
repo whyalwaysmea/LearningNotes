@@ -210,6 +210,7 @@ apk被宿主程序调起以后，apk中的activity其实就是一个普通的对
 在了解了Activity的启动流程之后，我们得知是`mInstrumentation.newActivity()`创建的Activity。   
 我们要做的就是通过替换掉Instrumentation类，达到定制插件运行环境的目的。  
 
+#### 简单的HOOK
 1. 替换Instrumentation类  
 ```java
 // 先获取到当前的ActivityThread对象
@@ -243,17 +244,23 @@ public Activity newActivity(ClassLoader cl, String className, Intent intent)
     }
     return super.newActivity(cl, className, intent);
 }
-```
+```  
+
+#### 生命周期管理   
+1. 反射  
+2. 接口  
+
 
 HOOK：   
 [8个类搞定插件化——Activity实现方案](https://kymjs.com/code/2016/05/15/01/)   
 [Android 插件化原理解析——Activity生命周期管理](http://weishu.me/2016/03/21/understand-plugin-framework-activity-management/)  
 
 动态代理：  
-[dynamic-load-apk](https://github.com/singwhatiwanna/dynamic-load-apk)   
 [知识总结 插件化学习 Activity加载分析](http://www.jianshu.com/p/127ecc0c7567)   
 [Android插件化系列第（五）篇---Activity的插件化方案（代理模式）](http://www.jianshu.com/p/7b2cc534d097)    
 
 
 ## 总结
-[Android动态加载技术 系列索引](https://segmentfault.com/a/1190000004086213)  
+[dynamic-load-apk](https://github.com/singwhatiwanna/dynamic-load-apk)   
+[Android动态加载技术 系列索引](https://segmentfault.com/a/1190000004086213)   
+[Android插件化原理解析——概要](http://weishu.me/2016/01/28/understand-plugin-framework-overview/)  
