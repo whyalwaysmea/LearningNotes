@@ -140,7 +140,7 @@ Java程序中，JVM虚拟机是通过类加载器ClassLoader加载.jar文件里�
 [Android插件化学习之路（三）之调用外部.dex文件中的代码](http://blog.csdn.net/u012124438/article/details/53236472)  
 
 
-### 资源访问   
+## 资源访问   
 res里的每一个资源都会在R.Java里生成一个对应的Integer类型的id，APP启动时会先把R.java注册到当前的上下文环境，我们在代码里以R文件的方式使用资源时正是通过使用这些id访问res资源，然而插件的R.java并没有注册到当前的上下文环境，所以插件的res资源也就无法通过id使用了。   
 
 平时我们所访问资源一般是通过`getResources().getXXX()`的方式来获取的。  
@@ -183,11 +183,9 @@ public int getColor(String colorName) {
 
 [插件化知识梳理(9) - 资源的动态加载示例及源码分析](http://www.jianshu.com/p/86dbf0360348)    
 
-###  调用插件中的Activity    
+##  调用插件中的Activity    
 apk被宿主程序调起以后，apk中的activity其实就是一个普通的对象，不具有activity的性质，因为系统启动activity是要做很多初始化工作的，而我们在应用层通过反射去启动activity是很难完成系统所做的初始化工作的，所以activity的大部分特性都无法使用包括activity的生命周期管理，这就需要我们自己去管理。当然还需要我们常说的上下文Context   
 
-
-#### 代理Activity
 需要先简单的了解一下Activity的[启动流程](http://www.jianshu.com/p/1035ffd9e9cf)。  
 在此就直接记录重要的结论：  
 >在`ActivityThread.java`的`performLaunchActivity`方法中，该方法通过Instrumentation的newActivity创建了activity类，接着完成了application的创建（没有创建Application的情况下，在该方法中就创建了Application的context），接着通过createBaseContextForActivity方法为该activity创建context，再调用attach方法进行绑定。  
@@ -206,7 +204,27 @@ apk被宿主程序调起以后，apk中的activity其实就是一个普通的对
 3. 启动新activity的约束：启动外部activity不受限制，启动apk内部的activity有限制，首先由于apk中的activity没注册，所以不支持隐式调用，其次必须通过BaseActivity中定义的新方法startActivityByProxy和startActivityForResultByProxy，还有就是不支持LaunchMode。
 
 
-#### 占坑Activity  
+### 生命周期管理   
+1. 反射  
+2. 接口  
+
+
+## 动态创建Activity  
+使用代理Activity有一些限制:  
+1. 实际运行的Activity实例其实都是ProxyActivity，并不是真正想要启动的Activity；  
+2. ProxyActivity只能指定一种LaunchMode，所以插件里的Activity无法自定义LaunchMode；  
+3. 不支持静态注册的BroadcastReceiver；  
+4. 往往不是所有的apk都可作为插件被加载，插件项目需要依赖特定的框架，还有需要遵循一定的”开发规范”；  
+
+解决对策就是，在需要启动插件的某一个Activity（比如PlugActivity）的时候，动态创建一个TargetActivity，新创建的TargetActivity会继承PlugActivity的所有共有行为，而这个TargetActivity的包名与类名刚好与我们事先注册的TargetActivity一致，我们就能以标准的方式启动这个Activity。   
+
+启动Activity是一个复杂的过程，有很多环节：Activity.startActivity()->Activity.startActivityForResult()->Instrument.excuteStartActivity()->ASM.startActivity()。大概又这么几个环节，详细了解可以参考文章：[《深入理解Activity的启动过程》](http://www.cloudchou.com/android/post-788.html)。 所谓“占坑”在宿主端的AndroidManifest.xml注册一个不存在的Activity，可以取名为StubActivity，同样启动插件的Activity都是启动StubActivity，然后在启动Activity的某个环节，我们找个“临时”演员来代替StubActivity，这个临时演员就是插件中定义的Activity，这叫“瞒天过海”。如何找“临时”演员？本章要讲的重点：使用 dexmaker 临时改造插件Activity。
+
+
+[插件化研究之dexmaker动态生成Activity](http://www.jianshu.com/p/7a9d52e73d05)  
+[Android插件化学习之路（六）之动态创建Activity](http://blog.csdn.net/u012124438/article/details/53239497)  
+
+### HOOK Activity  
 在了解了Activity的启动流程之后，我们得知是`mInstrumentation.newActivity()`创建的Activity。   
 我们要做的就是通过替换掉Instrumentation类，达到定制插件运行环境的目的。  
 
@@ -246,11 +264,6 @@ public Activity newActivity(ClassLoader cl, String className, Intent intent)
 }
 ```  
 
-#### 生命周期管理   
-1. 反射  
-2. 接口  
-
-
 HOOK：   
 [8个类搞定插件化——Activity实现方案](https://kymjs.com/code/2016/05/15/01/)   
 [Android 插件化原理解析——Activity生命周期管理](http://weishu.me/2016/03/21/understand-plugin-framework-activity-management/)  
@@ -259,8 +272,14 @@ HOOK：
 [知识总结 插件化学习 Activity加载分析](http://www.jianshu.com/p/127ecc0c7567)   
 [Android插件化系列第（五）篇---Activity的插件化方案（代理模式）](http://www.jianshu.com/p/7b2cc534d097)    
 
+## 各类分析文章  
+[插件化框架android-pluginmgr全解析](http://www.jianshu.com/p/b8ef0a92c060)  
+[Dynamic-Load-Apk源码解析](http://www.jianshu.com/p/30114b7176a3)  
+[Android 全面插件化 RePlugin 流程与源码解析](https://juejin.im/post/59752eb1f265da6c3f70eed9)  
+[Android插件化快速入门与实例解析（VirtualApk）](https://juejin.im/post/596b80ebf265da6c4d1bdfbe)  
 
-## 总结
-[dynamic-load-apk](https://github.com/singwhatiwanna/dynamic-load-apk)   
+
+## 系列文章   
 [Android动态加载技术 系列索引](https://segmentfault.com/a/1190000004086213)   
 [Android插件化原理解析——概要](http://weishu.me/2016/01/28/understand-plugin-framework-overview/)  
+[Android插件化入门指南](http://lruheng.com/2017/07/01/Android%E6%8F%92%E4%BB%B6%E5%8C%96%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/)  
