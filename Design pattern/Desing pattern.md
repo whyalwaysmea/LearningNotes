@@ -5,3 +5,7 @@
 ## [建造者模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F.md)
 
 ## [观察者模式](http://www.jianshu.com/p/dc22f292476e)
+
+## [外观模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F.md)
+
+## [图说设计模式](http://design-patterns.readthedocs.io/zh_CN/latest/index.html)
