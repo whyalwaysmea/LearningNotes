@@ -272,6 +272,19 @@ HOOK：
 [知识总结 插件化学习 Activity加载分析](http://www.jianshu.com/p/127ecc0c7567)   
 [Android插件化系列第（五）篇---Activity的插件化方案（代理模式）](http://www.jianshu.com/p/7b2cc534d097)    
 
+
+## 各类开源库比较  
+|特性|DynamicLoadApk|DynamicAPK|Small|DroidPlugin|VirtualAPK
+|-------------|:-------------:|:-----:|:-----:|:-----:|:-----:|
+| 支持四大组件 | 只支持Activity | 只支持Activity |只支持Activity|全支持|全支持
+| 组件无需在宿主manifest中预注册| √ |×|√|√|√
+| 插件可以依赖宿主| √ | √|√|×|√
+| 支持PendingIntent| × | ×|×|√|√
+| Android特性支持| 大部分 | 大部分|大部分|几乎全部|几乎全部
+| 兼容性适配| 一般 | 一般|中等|高|高
+| 插件构建| 无 |部署aapt |Gradle插件|无|Gradle插件
+
+
 ## 各类分析文章  
 [插件化框架android-pluginmgr全解析](http://www.jianshu.com/p/b8ef0a92c060)  
 [Dynamic-Load-Apk源码解析](http://www.jianshu.com/p/30114b7176a3)  
@@ -283,3 +296,4 @@ HOOK：
 [Android动态加载技术 系列索引](https://segmentfault.com/a/1190000004086213)   
 [Android插件化原理解析——概要](http://weishu.me/2016/01/28/understand-plugin-framework-overview/)  
 [Android插件化入门指南](http://lruheng.com/2017/07/01/Android%E6%8F%92%E4%BB%B6%E5%8C%96%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/)  
+[Android插件化与热修复](http://www.jianshu.com/p/e61a4d10e122)   
