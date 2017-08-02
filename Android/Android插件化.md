@@ -293,6 +293,7 @@ HOOK：
 
 
 ## 系列文章   
+[Android博客周刊专题之＃插件化开发](http://www.androidblog.cn/index.php/Index/detail/id/16?from=groupmessage)   
 [Android动态加载技术 系列索引](https://segmentfault.com/a/1190000004086213)   
 [Android插件化原理解析——概要](http://weishu.me/2016/01/28/understand-plugin-framework-overview/)  
 [Android插件化入门指南](http://lruheng.com/2017/07/01/Android%E6%8F%92%E4%BB%B6%E5%8C%96%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/)  

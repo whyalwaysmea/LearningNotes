@@ -156,8 +156,7 @@
 ### 热更新
 ### 增量更新
 ### 组件化
-### [插件化](http://www.androidblog.cn/index.php/Index/detail/id/16?from=groupmessage)
- * [Android插件化学习之路](http://blog.csdn.net/u012124438/article/details/53234223)
+### [插件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96.md) 
 
 ---
 ## 项目构建
