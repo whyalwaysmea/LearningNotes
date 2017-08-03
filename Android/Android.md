@@ -156,7 +156,7 @@
 ### 热更新
 ### 增量更新
 ### 组件化
-### [插件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96.md) 
+### [插件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96.md)
 
 ---
 ## 项目构建
@@ -196,8 +196,6 @@
 ## 面试
 ### [Android 名企面试题及涉及知识点整理](http://www.jianshu.com/p/735be5ece9e8?utm_source=desktop&utm_medium=timeline#)
 ### [一年Android工作经验，阿里 百度 网易 美团 小米 快手面经](http://blog.csdn.net/a296777513/article/details/73610719)
----
-## 技术周报
 
 ---
 ## 相关链接
