@@ -276,7 +276,7 @@ HOOK：
 ## 各类开源库比较  
 |特性|DynamicLoadApk|DynamicAPK|Small|DroidPlugin|VirtualAPK
 |-------------|:-------------:|:-----:|:-----:|:-----:|:-----:|
-| 支持四大组件 | 只支持Activity | 只支持Activity |只支持Activity|全支持|全支持
+| 支持四大组件 | 只支持Activity和普通Service | 只支持Activity |只支持Activity|全支持|全支持
 | 组件无需在宿主manifest中预注册| √ |×|√|√|√
 | 插件可以依赖宿主| √ | √|√|×|√
 | 支持PendingIntent| × | ×|×|√|√
