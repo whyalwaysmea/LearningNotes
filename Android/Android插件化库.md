@@ -17,6 +17,7 @@
 * 主题管理，需要给每个Activity单独设置主题    
 * 插件和宿主资源 id 可能重复的问题没有解决，需要修改 aapt 中资源 id 的生成规则；  
 
+--- 
 
 ### [DroidPlugin](https://github.com/DroidPluginTeam/DroidPlugin)    
 #### 源码分析  
