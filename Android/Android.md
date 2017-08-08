@@ -64,6 +64,7 @@
 -----
 ## [进程与线程](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B.md)
 ### 进程通信IPC
+* [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer/)  
 * [IPC简介](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/IPC%E7%AE%80%E4%BB%8B.md)
 * [IPC基础概念](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/IPC%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.md)
 * [Android中的IPC方式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E4%B8%AD%E7%9A%84IPC%E6%96%B9%E5%BC%8F.md)
