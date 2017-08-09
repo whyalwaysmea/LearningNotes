@@ -17,7 +17,7 @@
 * 主题管理，需要给每个Activity单独设置主题    
 * 插件和宿主资源 id 可能重复的问题没有解决，需要修改 aapt 中资源 id 的生成规则；  
 
---- 
+---
 
 ### [DroidPlugin](https://github.com/DroidPluginTeam/DroidPlugin)    
 #### 源码分析  
@@ -47,3 +47,27 @@
 3. 机型适配（不是所有机器上都能行，因为大量用反射相关，如果rom厂商深度定制了framework层，反射的方法或者类不在，容易插件运用失败）  
 4. 无法在插件中注册一些具有特殊Intent Filter的Service、Activity、BroadcastReceiver、ContentProvider等组件以供Android系统、已经安装的其他APP调用。  
 5. 缺乏对Native层的Hook，对某些带native代码的apk支持不好，可能无法运行。比如一部分游戏无法当作插件运行。  
+
+---
+### [RePlugin](https://github.com/Qihoo360/RePlugin)  
+
+#### 特点  
+1. 极其灵活：主程序无需升级（无需在Manifest中预埋组件），即可支持新增的四大组件，甚至全新的插件   
+2. 非常稳定：Hook点仅有一处（ClassLoader），无任何Binder Hook！如此可做到其崩溃率仅为“万分之一”，并完美兼容市面上近乎所有的Android ROM  
+3. 特性丰富：支持近乎所有在“单品”开发时的特性。包括静态Receiver、Task-Affinity坑位、自定义Theme、进程坑位、AppCompat、DataBinding等  
+
+#### 缺点  
+
+
+----
+
+### [VirtualAPK](https://github.com/didi/VirtualAPK)
+#### 使用接入
+[VirtualAPK插件框架介绍（一）----框架接入](http://www.jianshu.com/p/013510c19391)
+
+#### 源码分析
+[滴滴插件化方案 VirtualApk 源码解析](http://blog.csdn.net/lmj623565791/article/details/75000580)  
+[VirtualAPK 资源篇](https://www.notion.so/VirtualAPK-1fce1a910c424937acde9528d2acd537)  
+
+#### 特性
+[VirtualAPK的特性](https://github.com/didi/VirtualAPK/wiki#virtualapk%E7%9A%84%E7%89%B9%E6%80%A7)  
