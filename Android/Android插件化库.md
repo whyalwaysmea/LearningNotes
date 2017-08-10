@@ -58,7 +58,6 @@
 
 #### 缺点  
 
-
 ----
 
 ### [VirtualAPK](https://github.com/didi/VirtualAPK)
@@ -68,6 +67,7 @@
 #### 源码分析
 [滴滴插件化方案 VirtualApk 源码解析](http://blog.csdn.net/lmj623565791/article/details/75000580)  
 [VirtualAPK 资源篇](https://www.notion.so/VirtualAPK-1fce1a910c424937acde9528d2acd537)  
+[Android插件化快速入门与实例解析（VirtualApk）](http://mp.weixin.qq.com/s/eRQwaJUr9y93ANEIfjktnQ)  
 
 #### 特性
 [VirtualAPK的特性](https://github.com/didi/VirtualAPK/wiki#virtualapk%E7%9A%84%E7%89%B9%E6%80%A7)  
