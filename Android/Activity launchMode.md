@@ -19,7 +19,7 @@ android.util.AndroidRuntimeException: Calling startActivity() from outside of an
   这是因为standard模式的Activity默认会进入启动它的Activity所属的任务栈中，但是由于非Activity类型的Context(如ApplicationContext)并没有所谓的任务栈。解决这个问题的方法就是为待启动的Activity指定FLAG_ACTIVITY_NEW_TASK标记位，这样启动的时候就会为它创建一个新的任务栈，这个时候待启动Activity实际上是以singleTask模式启动的。
 
 * singleTop栈顶复用模式：
-  如果新Activity已经位于任务栈的栈顶，那么Activity不会被重新创建，所以它的启动三回调(onCreate, onStart, onResume)就不会执行，同时Activity的onNewIntent()方法会被回调。如果Activity已经存在，但是不再栈顶，那么作用和standard模式一样。
+  如果新Activity已经位于任务栈的栈顶，那么Activity不会被重新创建，所以它的启动三回调(onCreate, onStart, onResume)就不会执行，同时Activity的onNewIntent()方法会被回调, onPause -> onNewIntent -> onResume。如果Activity已经存在，但是不再栈顶，那么作用和standard模式一样。
 
 * singleTask栈内单例：
 activity只会在任务栈里面存在一个实例。如果要激活的activity，在任务栈里面已经存在，就不会创建新的activity，而是复用这个已经存在的activity，调用 onNewIntent() 方法，并且清空这个activity任务栈上面所有的activity。应用场景：大多数App的主页。对于大部分应用，当我们在主界面点击回退按钮的时候都是退出应用，那么当我们第一次进入主界面之后，主界面位于栈底，以后不管我们打开了多少个Activity，只要我们再次回到主界面，都应该使用将主界面Activity上所有的Activity移除的方式来让主界面Activity处于栈顶，而不是往栈顶新加一个主界面Activity的实例，通过这种方式能够保证退出应用时所有的Activity都能报销毁。  
