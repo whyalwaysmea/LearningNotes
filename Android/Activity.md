@@ -62,7 +62,7 @@ onRestoreInstanceState的调用时机在onStart之后。
 
 ## Q&A
 ### Android的Activity什么时候会调用onCreate()而不调用onStart()？
-直接oncreate里就ondestroy就行
+直接oncreate里就finish()就行
 
 
 ### onStart(),与onResume()有什么区别?
