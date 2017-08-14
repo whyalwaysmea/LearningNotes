@@ -126,7 +126,8 @@
 * [RxJava 2.x 学习](https://xiaobailong24.me/2017/03/18/Android-RxJava2.x/)
 * [Just & From](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/just%20%26%20from.md)
 * [repeatWhen() & retryWhen()](http://www.jianshu.com/p/023a5f60e6d0)
-* [RxCache](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/rxcache.png)
+* [RxCache](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/rxcache.png) 
+* [RxJava2.X 源码解析](http://www.cherylgood.cn/tags/RxJava2.x)   
 
 ### Dagger2
 * [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Dagger2.md)
@@ -167,7 +168,8 @@
 ### [多渠道打包](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E5%A4%9A%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85.md)
 ### [混淆](http://droidyue.com/blog/2016/07/10/understanding-android-obfuscated-code-by-proguard/)
 ### [Android混淆那些事](http://mp.weixin.qq.com/s/WmJyiA3fDNriw5qXuoA9MA)
-### [Gradle](http://www.cnblogs.com/CloudTeng/p/3417762.html)
+### [Gradle](http://www.cnblogs.com/CloudTeng/p/3417762.html)  
+- [Gradle从入门到实战 - Groovy基础](http://blog.csdn.net/singwhatiwanna/article/details/76084580)  
 ### AndroidManifest
 ### [权限管理](http://www.jianshu.com/p/07e1a1cff5ad)
 ### adb
