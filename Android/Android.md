@@ -157,7 +157,7 @@
 ## 进阶
 ### 热更新
 ### 增量更新
-### 组件化
+### [组件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E7%BB%84%E4%BB%B6%E5%8C%96.md)   
 ### [插件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96.md)  
 - [插件化库分析对比](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96%E5%BA%93.md)  
 
