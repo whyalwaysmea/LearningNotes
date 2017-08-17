@@ -78,6 +78,7 @@
 ### sqlite
 ### 序列化   
 * [Gson]()
+* [FastJson那些事](http://mp.weixin.qq.com/s/xA2w4tfC8rSitz7Suj4dtg)  
 ### Android文件系统
 ### [Android存储挖坑记](http://blog.desmondyao.com/android-storage/)
 
