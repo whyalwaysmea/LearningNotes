@@ -201,6 +201,7 @@
 ## 面试
 ### [Android 名企面试题及涉及知识点整理](http://www.jianshu.com/p/735be5ece9e8?utm_source=desktop&utm_medium=timeline#)
 ### [一年Android工作经验，阿里 百度 网易 美团 小米 快手面经](http://blog.csdn.net/a296777513/article/details/73610719)
+### [Android知识点最新最全梳理—Android面试大纲](http://mp.weixin.qq.com/s/qTdzS_TkiyvreG0FaXHJYw)
 
 ---
 ## 相关链接
