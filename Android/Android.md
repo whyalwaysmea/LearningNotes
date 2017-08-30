@@ -185,7 +185,7 @@
 
 ---
 ## JNI与NDK
-
+### [关于Android的.so文件你所需要知道的](http://www.jianshu.com/p/cb05698a1968)
 ---
 ## 开发相关
 ### git,svn
