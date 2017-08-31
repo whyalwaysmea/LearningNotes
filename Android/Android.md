@@ -78,7 +78,6 @@
 ### sqlite
 ### 序列化   
 * [Gson]()
-* [FastJson那些事](http://mp.weixin.qq.com/s/xA2w4tfC8rSitz7Suj4dtg)  
 ### Android文件系统
 ### [Android存储挖坑记](http://blog.desmondyao.com/android-storage/)
 
@@ -127,8 +126,7 @@
 * [RxJava 2.x 学习](https://xiaobailong24.me/2017/03/18/Android-RxJava2.x/)
 * [Just & From](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/just%20%26%20from.md)
 * [repeatWhen() & retryWhen()](http://www.jianshu.com/p/023a5f60e6d0)
-* [RxCache](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/rxcache.png) 
-* [RxJava2.X 源码解析](http://www.cherylgood.cn/tags/RxJava2.x)   
+* [RxCache](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/rxcache.png)
 
 ### Dagger2
 * [Dagger2的简单使用](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Dagger2.md)
@@ -158,7 +156,7 @@
 ## 进阶
 ### 热更新
 ### 增量更新
-### [组件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/%E7%BB%84%E4%BB%B6%E5%8C%96.md)   
+### 组件化
 ### [插件化](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96.md)  
 - [插件化库分析对比](https://github.com/whyalwaysmea/LearningNotes/blob/master/Android/Android%E6%8F%92%E4%BB%B6%E5%8C%96%E5%BA%93.md)  
 
@@ -185,7 +183,7 @@
 
 ---
 ## JNI与NDK
-### [关于Android的.so文件你所需要知道的](http://www.jianshu.com/p/cb05698a1968)
+
 ---
 ## 开发相关
 ### git,svn
@@ -201,7 +199,6 @@
 ## 面试
 ### [Android 名企面试题及涉及知识点整理](http://www.jianshu.com/p/735be5ece9e8?utm_source=desktop&utm_medium=timeline#)
 ### [一年Android工作经验，阿里 百度 网易 美团 小米 快手面经](http://blog.csdn.net/a296777513/article/details/73610719)
-### [Android知识点最新最全梳理—Android面试大纲](http://mp.weixin.qq.com/s/qTdzS_TkiyvreG0FaXHJYw)
 
 ---
 ## 相关链接
