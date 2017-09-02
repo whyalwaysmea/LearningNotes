@@ -8,4 +8,5 @@
 
 [LeetCode题解](https://www.gitbook.com/read/book/siddontang/leetcode-solution)  
 
+[《LeetBook（LeetCode详解）》](https://hk029.gitbooks.io/leetbook/content/)
 [《LeetBook（LeetCode详解）》](https://hk029.gitbooks.io/leetbook/content/)  
