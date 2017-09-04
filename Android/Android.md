@@ -194,7 +194,7 @@
 ### MVC,MVP,MVVM
 ### Flux
 ### 设计模式
-
+### [基于开源项目搭建属于自己的技术堆栈](http://www.jianshu.com/p/42d45998117f)
 ---
 ## 面试
 ### [Android 名企面试题及涉及知识点整理](http://www.jianshu.com/p/735be5ece9e8?utm_source=desktop&utm_medium=timeline#)
