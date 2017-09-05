@@ -27,8 +27,9 @@
 
 ## [线程](https://github.com/whyalwaysmea/LearningNotes/blob/master/Java/%E5%AD%90%E7%BA%BF%E7%A8%8B%E3%81%AE%E7%BA%BF%E7%A8%8B%E6%B1%A0.md)
 
-## [Java多线程系列目录(共43篇)](http://www.cnblogs.com/skywang12345/p/java_threads_category.html)
-
+### [Java多线程系列目录(共43篇)](http://www.cnblogs.com/skywang12345/p/java_threads_category.html) 
+ 
+### [http://www.jianshu.com/nb/12118685](http://www.jianshu.com/nb/12118685)
 ## 基础
 
 [equals 和 ==](https://androidzzt.github.io/2017/03/28/Android-%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87%E4%B9%8B%E3%80%8Cequals-%E5%92%8C-%E3%80%8D/)
