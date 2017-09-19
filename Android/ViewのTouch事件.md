@@ -189,6 +189,9 @@ public boolean onInterceptTouchEvent(MotionEvent ev) {
 }
 ```
 
+# 多点触控
+// TODO
+
 # 相关链接
 [图解 Android 事件分发机制](http://www.jianshu.com/p/e99b5e8bd67b#)
 
