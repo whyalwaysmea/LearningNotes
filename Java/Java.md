@@ -42,7 +42,8 @@
 -----
  
 ## Spring 
-[spring boot要如何学习？](https://www.zhihu.com/question/53729800)
+[spring boot要如何学习？](https://www.zhihu.com/question/53729800)  
+[跟我学spring3](http://jinnianshilongnian.iteye.com/blog/1482071)
 
 ## SSH 
 [Java新手如何学习Spring、Struts、Hibernate三大框架？](https://www.zhihu.com/question/21142149)
