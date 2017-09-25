@@ -37,3 +37,12 @@
 ## 基础
 
 [equals 和 ==](https://androidzzt.github.io/2017/03/28/Android-%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87%E4%B9%8B%E3%80%8Cequals-%E5%92%8C-%E3%80%8D/)
+ 
+ 
+-----
+ 
+## Spring 
+[spring boot要如何学习？](https://www.zhihu.com/question/53729800)
+
+## SSH 
+[Java新手如何学习Spring、Struts、Hibernate三大框架？](https://www.zhihu.com/question/21142149)
