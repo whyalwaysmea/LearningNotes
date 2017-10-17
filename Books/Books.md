@@ -16,3 +16,5 @@
 
 [Spring Boot参考指南](http://blog.didispace.com/books/spring-boot-reference/)
 
+[spring-framework-4-reference](https://waylau.gitbooks.io/spring-framework-4-reference/)
+
