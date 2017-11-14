@@ -16,7 +16,9 @@
 
 [Spring Boot参考指南](http://blog.didispace.com/books/spring-boot-reference/)
 
-[spring-framework-4-reference](https://waylau.gitbooks.io/spring-framework-4-reference/)
+[spring-framework-4-reference](https://waylau.gitbooks.io/spring-framework-4-reference/)  
+
+[spring-boot 项目实践总结](https://github.com/timebusker/spring-boot)
 
  
 ## 必备
