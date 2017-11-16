@@ -24,6 +24,7 @@
 
 [SpringBoot-Learning](https://github.com/dyc87112/SpringBoot-Learning)
 
- 
+[从零开始学Spring Boot](http://412887952-qq-com.iteye.com/)
+
 ## 必备
 [git-recipes](https://github.com/geeeeeeeeek/git-recipes/wiki)
