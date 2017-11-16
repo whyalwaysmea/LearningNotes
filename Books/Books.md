@@ -26,5 +26,7 @@
 
 [从零开始学Spring Boot](http://412887952-qq-com.iteye.com/)
 
+[spring boot实战](http://blog.csdn.net/liaokailin/article/category/5765237)
+
 ## 必备
 [git-recipes](https://github.com/geeeeeeeeek/git-recipes/wiki)
