@@ -30,3 +30,5 @@
 
 ## 必备
 [git-recipes](https://github.com/geeeeeeeeek/git-recipes/wiki)
+
+[Pro Git 第一版（中文版）](https://www.kancloud.cn/thinkphp/pro-git)
