@@ -8,4 +8,6 @@
 
 ## [外观模式](https://github.com/whyalwaysmea/LearningNotes/blob/master/Design%20pattern/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F.md)
 
-## [图说设计模式](http://design-patterns.readthedocs.io/zh_CN/latest/index.html)
+## [图说设计模式](http://design-patterns.readthedocs.io/zh_CN/latest/index.html) 
+ 
+## [Design patterns implemented in Java](http://java-design-patterns.com/)
