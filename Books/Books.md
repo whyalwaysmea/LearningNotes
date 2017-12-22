@@ -1,4 +1,6 @@
 [免费的编程中文书籍索引](http://siberiawolf.com/free_programming/index.html)  
+ 
+[it-ebooks-cn](https://github.com/fuhmmin/it-ebooks-cn)
 
 [图说设计模式](http://design-patterns.readthedocs.io/zh_CN/latest/index.html)
 
