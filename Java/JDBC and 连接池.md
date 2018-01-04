@@ -1,6 +1,6 @@
 # JDBC基本概念
 jdbc：Java Database Connectivity  
-un公司为了统一对数据库的操作，定义了一套api，称之为jdbc  
+sun公司为了统一对数据库的操作，定义了一套api，称之为jdbc  
 这套api完全由接口组成，我们在编写程序的时候针对接口进行调用  
 这些接口交给数据库厂家去实现， 不同的数据库厂商会提供不同的实现类，这些实现类被我们称作数据库的驱动  
 
@@ -81,6 +81,29 @@ Connection conn = DriverManager.getConnection(url);
 ``` 
 
 **补充:** 如果访问的localhost:3306,url 可省写为jdbc:mysql:///test
+
+## Statement和PrepareStatement 
+其实这俩干的活儿都一样，就是创建了一个对象然后去通过对象调用executeQuery方法来执行sql语句。最明显的区别，就是执行的sql语句格式不同。   
+
+代码背景：我们有一个数据库，里面有一个user表，有username,userpwd两列。我们要查出这两列的数据。
+```sql
+// 使用
+String sql = "select * from users where  username= '"+username+"' and userpwd='"+userpwd+"'";  
+Statement stmt = conn.createStatement();  
+ResultSet rs = stmt.executeQuery(sql);  
+```
+```sql
+String sql = "select * from users where  username=? and userpwd=?";  
+PrepareStatement pstmt = conn.prepareStatement(sql);  
+pstmt.setString(1, username);  
+pstmt.setString(2, userpwd);  
+ResultSet rs = pstmt.executeQuery();  
+```
+
+PrepareStatement接口是Statement接口的子接口，他继承了Statement接口的所有功能。它主要是拿来解决我们使用Statement对象多次执行同一个SQL语句的效率问题的。ParperStatement接口的机制是在数据库支持预编译的情况下预先将SQL语句编译，当多次执行这条SQL语句时，可以直接执行编译好的SQL语句，这样就大大提高了程序的灵活性和执行效率。   
+
+因为预编译，所以PrepareStatement还可以防止sql注入
+
 
 
 # JDBC事务 
@@ -163,4 +186,48 @@ where子句。然后事务1再次使用相同的查询读取行，但是现在�
 而MySQL的默认事务隔离级别是：Repeatable Read
 
 
-# 数据库连接池
+# 数据库连接池 
+## 什么是连接池  
+传统的开发模式下，Servlet处理用户的请求，找Dao查询数据，dao会创建与数据库之间的链接，完成数据查询后会关闭数据库的链接。  
+
+这样的方式会导致用户每次请求都要向数据库建立链接而数据库创建连接通常需要消耗相对较大的资源，创建时间也较长。假设网站一天10万访问量，数据库服务器就需要创建10万次连接，极大的浪费数据库的资源，并且极易造成数据库服务器内存溢出、宕机。
+
+解决方案: 就是数据库连接池  
+连接池就是数据库连接对象的一个缓冲池  
+我们可以先创建10个数据库连接缓存在连接池中，当用户有请求过来的时候，dao不必创建数据库连接，而是从数据库连接池中获取一个，用完了也不必关闭连接，而是将连接换回池子当中，继续缓存
+
+使用数据库连接池可以极大地提高系统的性能
+
+数据库连接池负责分配、管理和释放数据库连接，它允许应用程序重复使用一个现有的数据库连接，而不是再重新建立一个；释放空闲时间超过最大空闲时间的数据库连接来避免因为没有释放数据库连接而引起的数据库连接遗漏。这项技术能明显提高对数据库操作的性能。
+
+## 实现数据库连接池  
+dbc针对数据库连接池定义的接口java.sql.DataSource，所有的数据库连接池实现都要实现该接口  
+该接口中定义了两个重载的方法
+```java
+Connection getConnection() 
+Connection getConnection(String username, String password) 
+```
+数据库连接池实现思路  
+1. 定义一个类实现java.sql.DataSource接口
+2. 定义一个集合用于保存Connection对象，由于频繁地增删操作，用LinkedList比较好
+3. 实现getConnection方法，在方法中取出LinkedList集合中的一个连接对象返回
+
+注意：   
+- 返回的Connection对象不是从集合中获得，而是删除   
+- 用户用完Connection，会调用close方法释放资源，此时要保证连接换回连接池，而不是关闭连接
+- 重写close方法是难点，解决方案： 装饰设计模式、动态代理
+
+
+## 开源的数据库连接池  
+通常我们把DataSource的实现，按其英文含义称之为数据源，数据源中都包含了数据库连接池的实现。  
+
+### DBCP数据源  
+DBCP 是 Apache 软件基金组织下的开源连接池实现。  
+Tomcat 的连接池正是采用该连接池来实现的。该数据库连接池既可以与应用服务器整合使用，也可由应用程序独立使用。 
+
+### C3P0数据源 
+C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支持JDBC3规范和JDBC2的标准扩展。目前使用它的开源项目有Hibernate，Spring等。C3P0数据源在项目开发中使用得比较多。 
+
+c3p0与dbcp区别：  
+1. dbcp没有自动回收空闲连接的功能   
+2. c3p0有自动回收空闲连接功能
