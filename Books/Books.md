@@ -33,6 +33,12 @@
 [从零开始学Spring Boot](http://412887952-qq-com.iteye.com/)
 
 [spring boot实战](http://blog.csdn.net/liaokailin/article/category/5765237)
+ 
+### SpringCloud 
+
+[SpringCloud-Learning](https://gitee.com/didispace/SpringCloud-Learning)
+
+[spring-cloud-7simple](https://gitee.com/zhou666/spring-cloud-7simple)
 
 ## 必备
 [git-recipes](https://github.com/geeeeeeeeek/git-recipes/wiki)
