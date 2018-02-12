@@ -1,0 +1,1 @@
+# [给小白的 Nginx 30分钟入门指南](https://zhuanlan.zhihu.com/p/33694543?utm_source=com.tencent.tim&utm_medium=social)
