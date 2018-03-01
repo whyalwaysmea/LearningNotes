@@ -40,6 +40,8 @@
 
 [spring-cloud-7simple](https://gitee.com/zhou666/spring-cloud-7simple)
 
+[史上最简单的 SpringCloud 教程 | 终章](http://blog.csdn.net/forezp/article/details/70148833)
+
 ## 必备
 [git-recipes](https://github.com/geeeeeeeeek/git-recipes/wiki)
 
