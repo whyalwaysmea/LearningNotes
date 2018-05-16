@@ -17,5 +17,5 @@ Algorithm and Data structure is just some concepts. More topic can see [myLeetCo
 
 ### [Books](https://github.com/whyalwaysmea/LearningNotes/blob/master/Books/Books.md)
 
-### [前端](https://github.com/whyalwaysmea/my-vue)
+### [Vue](https://github.com/whyalwaysmea/my-vue)
 
